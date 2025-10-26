@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thung</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-container fade-in">
+            <div class="login-header">
+                <h1>Bem-vindo boss do thung</h1>
+                <p>Faça login para acessar sua conta</p>
+            </div>
+            
+            <div class="logo-container">
+                <img src="Img/0e640b26-7e38-4e2b-962b-d12ad80d18e7.jpeg" alt="Logo Thung" class="logo">
+            </div>
+            
+            <div class="login-body">
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label for="usuario" class="form-label">Usuário</label>
+                        <input type="text" class="form-control" id="usuario" placeholder="Digite seu usuário" required>
+                        <div class="invalid-feedback">
+                            Por favor, insira seu usuário.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="senha" class="form-label">Senha</label>
+                        <input type="password" class="form-control" id="senha" placeholder="Digite sua senha" required>
+                        <div class="invalid-feedback">
+                            Por favor, insira sua senha.
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-login w-100">Entrar</button>
+                </form>
+            </div>
+            
+           
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validação do formulário
+        /*
+            document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const usuario = document.getElementById('usuario');
+            const senha = document.getElementById('senha');
+            let isValid = true;
+            
+            // Validação do usuário
+            if (usuario.value.trim() === '') {
+                usuario.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                usuario.classList.remove('is-invalid');
+            }
+            
+            // Validação da senha
+            if (senha.value.trim() === '') {
+                senha.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                senha.classList.remove('is-invalid');
+            }
+            
+            // Se o formulário for válido, simular login
+            if (isValid) {
+                // Simulação de login bem-sucedido
+                const btn = document.querySelector('.btn-login');
+                btn.textContent = 'Entrando...';
+                btn.disabled = true;
+                
+                setTimeout(function() {
+                    alert('Login realizado com sucesso!');
+                    btn.textContent = 'Entrar';
+                    btn.disabled = false;
+                    // Aqui você normalmente redirecionaria para a página principal
+                    // window.location.href = 'dashboard.html';
+                }, 1500);
+            }
+        });
+        
+        // Remover mensagens de erro quando o usuário começar a digitar
+        document.getElementById('usuario').addEventListener('input', function() {
+            if (this.classList.contains('is-invalid')) {
+                this.classList.remove('is-invalid');
+            }
+        });
+        
+        document.getElementById('senha').addEventListener('input', function() {
+            if (this.classList.contains('is-invalid')) {
+                this.classList.remove('is-invalid');
+            }
+        });
+        */
+        
+    </script>
+</body>
+
+</html>
