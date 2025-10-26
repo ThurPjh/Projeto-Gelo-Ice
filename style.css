@@ -67,34 +67,5 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
-/* --- MOBILE (até 767px) --- */
-@media (max-width: 767px) {
 
-    body {
-        background: #ffffff; /* fundo branco */
-        height: 100vh;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
 
-    .card {
-        width: 100vw;
-        height: 100vh;
-        border-style: none;
-        border-radius: 0; /* deixa o card sem bordas arredondadas */
-        box-shadow: none; /* remove sombra para parecer tela */
-        display: flex;
-        justify-content: center;
-        flex-direction: column;
-    }
-
-    .card img.logo {
-        width: 150px;
-        margin-bottom:200px;
-    }
-
-    
-}
