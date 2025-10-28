@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estoque - Gelo Saborizado</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/Projeto Gelo Ice/style.css">
+</head>
+
+<body>
+    <div class="container my-4" style="max-width: 380px;">
+        <div class="card p-4 mt-5" style="max-height: 75vh; overflow-y: auto;">
+
+
+            <!-- Logo -->
+            <div >
+                <img src="/Projeto Gelo Ice/Img/372ba3ab23b82a3d8594faf835be6f257754f636.png"
+                    class="logo text-center mb-4"
+                    onclick="window.location.href='estoque-main.html'"
+                    style="cursor: pointer;">
+            </div>
+
+            <!-- Maçã Verde -->
+            <div class="card mb-3 p-2" style="background: #1280c9; color: white; border-radius: 12px;">
+                <div class="d-flex align-items-center">
+                    <img src="/Projeto Gelo Ice/Img/Gelo.png" class="me-3 icone-gelo">
+                    <div class="flex-grow-1">
+                        <strong id="nome-maca-verde">Maçã Verde</strong><br>
+                        Quantidade: <span id="quantidade-maca-verde">0</span><br>
+                        R$ <span id="preco-maca-verde">6,00</span>
+                    </div>
+                    <div class="text-end">
+                        Valor total<br>
+                        <strong>R$ <span id="total-maca-verde">0,00</span></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Maracujá -->
+            <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
+                <div class="d-flex align-items-center">
+                    <img src="/Projeto Gelo Ice/Img/Gelo.png" class="me-3 icone-gelo">
+                    <div class="flex-grow-1">
+                        <strong>Maracujá</strong><br>
+                        Quantidade: <span id="quantidade-maracuja">0</span><br>
+                        R$ <span id="preco-maracuja">6,00</span>
+                    </div>
+                    <div class="text-end">
+                        Valor total<br>
+                        <strong>R$ <span id="total-maracuja">0,00</span></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Morango -->
+            <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
+                <div class="d-flex align-items-center">
+                    <img src="/Projeto Gelo Ice/Img/Gelo.png" class="me-3 icone-gelo">
+                    <div class="flex-grow-1">
+                        <strong>Morango</strong><br>
+                        Quantidade: <span id="quantidade-morango">0</span><br>
+                        R$ <span id="preco-morango">6,00</span>
+                    </div>
+                    <div class="text-end">
+                        Valor total<br>
+                        <strong>R$ <span id="total-morango">0,00</span></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coco -->
+            <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
+                <div class="d-flex align-items-center">
+                    <img src="/Projeto Gelo Ice/Img/Gelo.png" class="me-3 icone-gelo">
+                    <div class="flex-grow-1">
+                        <strong>Coco</strong><br>
+                        Quantidade: <span id="quantidade-coco">0</span><br>
+                        R$ <span id="preco-coco">6,00</span>
+                    </div>
+                    <div class="text-end">
+                        Valor total<br>
+                        <strong>R$ <span id="total-coco">0,00</span></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Limão -->
+            <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
+                <div class="d-flex align-items-center">
+                    <img src="/Projeto Gelo Ice/Img/Gelo.png" class="me-3 icone-gelo">
+                    <div class="flex-grow-1">
+                        <strong>Limão</strong><br>
+                        Quantidade: <span id="quantidade-limao">0</span><br>
+                        R$ <span id="preco-limao">6,00</span>
+                    </div>
+                    <div class="text-end">
+                        Valor total<br>
+                        <strong>R$ <span id="total-limao">0,00</span></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Melancia -->
+            <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
+                <div class="d-flex align-items-center">
+                    <img src="/Projeto Gelo Ice/Img/Gelo.png" class="me-3 icone-gelo">
+                    <div class="flex-grow-1">
+                        <strong>Melancia</strong><br>
+                        Quantidade: <span id="quantidade-melancia">0</span><br>
+                        R$ <span id="preco-melancia">6,00</span>
+                    </div>
+                    <div class="text-end">
+                        Valor total<br>
+                        <strong>R$ <span id="total-melancia">0,00</span></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Limão e Gengibre -->
+            <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
+                <div class="d-flex align-items-center">
+                    <img src="/Projeto Gelo Ice/Img/Gelo.png" class="me-3 icone-gelo">
+                    <div class="flex-grow-1">
+                        <strong>Limão e Gengibre</strong><br>
+                        Quantidade: <span id="quantidade-limao-gengibre">0</span><br>
+                        R$ <span id="preco-limao-gengibre">6,00</span>
+                    </div>
+                    <div class="text-end">
+                        Valor total<br>
+                        <strong>R$ <span id="total-limao-gengibre">0,00</span></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cerveja -->
+            <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
+                <div class="d-flex align-items-center">
+                    <img src="/Projeto Gelo Ice/Img/Gelo.png" class="me-3 icone-gelo">
+                    <div class="flex-grow-1">
+                        <strong>Cerveja</strong><br>
+                        Quantidade: <span id="quantidade-cerveja">0</span><br>
+                        R$ <span id="preco-cerveja">6,00</span>
+                    </div>
+                    <div class="text-end">
+                        Valor total<br>
+                        <strong>R$ <span id="total-cerveja">0,00</span></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Beats Red Mix -->
+            <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
+                <div class="d-flex align-items-center">
+                    <img src="/Projeto Gelo Ice/Img/Gelo.png" class="me-3 icone-gelo">
+                    <div class="flex-grow-1">
+                        <strong>Beats Red Mix</strong><br>
+                        Quantidade: <span id="quantidade-beats-red">0</span><br>
+                        R$ <span id="preco-beats-red">6,00</span>
+                    </div>
+                    <div class="text-end">
+                        Valor total<br>
+                        <strong>R$ <span id="total-beats-red">0,00</span></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Beats Sense -->
+            <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
+                <div class="d-flex align-items-center">
+                    <img src="/Projeto Gelo Ice/Img/Gelo.png" class="me-3 icone-gelo">
+                    <div class="flex-grow-1">
+                        <strong>Beats Sense</strong><br>
+                        Quantidade: <span id="quantidade-beats-sense">0</span><br>
+                        R$ <span id="preco-beats-sense">6,00</span>
+                    </div>
+                    <div class="text-end">
+                        Valor total<br>
+                        <strong>R$ <span id="total-beats-sense">0,00</span></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Beats GT -->
+            <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
+                <div class="d-flex align-items-center">
+                    <img src="/Projeto Gelo Ice/Img/Gelo.png" class="me-3 icone-gelo">
+                    <div class="flex-grow-1">
+                        <strong>Beats GT</strong><br>
+                        Quantidade: <span id="quantidade-beats-gt">0</span><br>
+                        R$ <span id="preco-beats-gt">6,00</span>
+                    </div>
+                    <div class="text-end">
+                        Valor total<br>
+                        <strong>R$ <span id="total-beats-gt">0,00</span></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Laranja -->
+            <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
+                <div class="d-flex align-items-center">
+                    <img src="/Projeto Gelo Ice/Img/Gelo.png" class="me-3 icone-gelo">
+                    <div class="flex-grow-1">
+                        <strong>Laranja</strong><br>
+                        Quantidade: <span id="quantidade-laranja">0</span><br>
+                        R$ <span id="preco-laranja">6,00</span>
+                    </div>
+                    <div class="text-end">
+                        Valor total<br>
+                        <strong>R$ <span id="total-laranja">0,00</span></strong>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
