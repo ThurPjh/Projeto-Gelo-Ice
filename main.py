@@ -7,7 +7,7 @@ from fastapi import FastAPI, Request, Form
 
 app = FastAPI()
 
-templates = Jinja2Templates(directory="Projeto-Gelo-Ice")
+templates = Jinja2Templates(directory="templetes")
 
 @app.get("/login", response_class=HTMLResponse)
 def login_get(request: Request):
