@@ -1,21 +1,44 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Form, Depends
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
-from fastapi import FastAPI, Request, Form
-
-#esse codigo funciona a base da fé, por favor tenha fé que o codigo vá funcionar!!! 🙏
+from fastapi.responses import HTMLResponse, RedirectResponse
+from sqlalchemy.orm import Session
+from database import SessionLocal
+from auth import AuthUser
 
 app = FastAPI()
 
 templates = Jinja2Templates(directory="templetes")
 
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+@app.get("/", response_class=HTMLResponse)
+def inicio(request: Request):
+    return templates.TemplateResponse("inicio.html", {"request": request})
+
+
 @app.get("/login", response_class=HTMLResponse)
 def login_get(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
-@app.post ("/login")
-def login_post(username: str = Form("username"), password: str = Form("password")):
-    if username == "admin" and password == "123":
-        return {"message": "Login bem-sucedido!"}
+
+@app.post("/login")
+def login_post(
+    username: str = Form(...),  # 
+    password: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    if AuthUser(db, username, password):
+        return RedirectResponse(url="/", status_code=303)
     else:
-        return {"message": "Login mal-sucedido!"}
+        return templates.TemplateResponse(
+            "login.html",
+            {"request": request, "error": "Usuário ou senha inválidos"},
+            status_code=401
+        )
