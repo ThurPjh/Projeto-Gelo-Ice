@@ -6,7 +6,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0077b6, #00b4d8);
+            background: linear-gradient(to right, #0d6efd, #66b2ff);
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -65,7 +65,32 @@
         .card {
             border-radius: 15px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            
         }
 
+        .card-estoque {
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background-color: #1280c9;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .icone-gelo {
+            width: 80px;
+            height: 80px;
 
+        }
+
+        .card::-webkit-scrollbar {
+    width: 6px;
+}
+
+.card::-webkit-scrollbar-thumb {
+    background: #999;
+    border-radius: 6px;
+}
+
+.card::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
 
