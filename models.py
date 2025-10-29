@@ -14,3 +14,4 @@ class Cliente(Base):
     id = Column(Integer, primary_key=True, index=True)
     nome = Column(String, index=True)
     data_cadastro = Column(DateTime)
+ 
