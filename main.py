@@ -6,6 +6,10 @@ from database import SessionLocal
 from auth import AuthUser
 
 app = FastAPI()
+from fastapi.staticfiles import StaticFiles
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 templates = Jinja2Templates(directory="templetes")
 
@@ -21,6 +25,7 @@ def get_db():
 @app.get("/", response_class=HTMLResponse)
 def inicio(request: Request):
     return templates.TemplateResponse("inicio.html", {"request": request})
+
 
 
 @app.get("/login", response_class=HTMLResponse)
@@ -42,3 +47,11 @@ def login_post(
             {"request": request, "error": "Usuário ou senha inválidos"},
             status_code=401
         )
+
+@app.get("/estoque", response_class=HTMLResponse)
+def estoque(request: Request):
+    return templates.TemplateResponse("estoque-main.html", {"request": request})
+
+@app.get("/clientes", response_class=HTMLResponse)
+def clientes(request: Request):
+    return templates.TemplateResponse("clientes.html", {"request": request})
