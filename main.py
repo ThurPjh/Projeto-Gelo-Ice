@@ -4,6 +4,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from auth import AuthUser
+from models import Cliente
 
 app = FastAPI()
 from fastapi.staticfiles import StaticFiles
@@ -52,6 +53,11 @@ def login_post(
 def estoque(request: Request):
     return templates.TemplateResponse("estoque-main.html", {"request": request})
 
-@app.get("/clientes", response_class=HTMLResponse)
+@app.get("/estoque-saborizado", response_class=HTMLResponse)
 def clientes(request: Request):
-    return templates.TemplateResponse("clientes.html", {"request": request})
+    return templates.TemplateResponse("estoque-gelo-saborizado.html", {"request": request})
+
+@app.get("/clientes", response_class=HTMLResponse)
+def clientes(request: Request, db: Session = Depends(get_db)):
+    lista_clientes = db.query(Cliente).all()
+    return templates.TemplateResponse("clientes.html", {"request": request, "clientes": lista_clientes})

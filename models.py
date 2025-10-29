@@ -9,4 +9,8 @@ class User(Base):
     password = Column(String)
 
 
-
+class Cliente(Base):
+    __tablename__ = "clientes"
+    id = Column(Integer, primary_key=True, index=True)
+    nome = Column(String, index=True)
+    data_cadastro = Column(DateTime)
