@@ -26,14 +26,16 @@
                 <input type="text" id="searchInput" class="form-control" placeholder="Buscar cliente...">
 
                 <!-- Botão de adicionar -->
-                <button class="btn btn-primary" style="border-top-right-radius: 5px; border-bottom-right-radius: 5px;" type="button" data-bs-toggle="modal" data-bs-target="#modalAddCliente">
+                <button class="btn btn-primary" style="border-top-right-radius: 5px; border-bottom-right-radius: 5px;"
+                    type="button" data-bs-toggle="modal" data-bs-target="#modalAddCliente">
                     <span class="fw-bold">+</span>
                 </button>
 
                 <!-- Modal de cadastro -->
+                <!-- Modal de cadastro -->
                 <div class="modal fade" id="modalAddCliente" tabindex="-1" aria-labelledby="modalAddClienteLabel"
                     aria-hidden="true">
-                    <div class="modal-dialog">
+                    <div class="modal-dialog modal-dialog-centered modal-sm">
                         <form method="post" action="/clientes/adicionar">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -56,12 +58,13 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="submit" class="btn btn-success">Salvar</button>
+                                    <button type="submit" class="btn btn-success w-100">Salvar</button>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
+
 
             </div>
 
@@ -69,7 +72,7 @@
             {% for cliente in clientes %}
             <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
                 <div class="d-flex align-items-center">
-                    <img src="/static/Img/Gelo.png" class="me-3 icone-gelo">
+                    <img src="/static/Img/clientes.png" class="me-3 icone-gelo">
                     <div class="d-flex flex-column">
                         <strong>{{ cliente.nome }}</strong>
                     </div>

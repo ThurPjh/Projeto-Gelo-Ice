@@ -18,25 +18,28 @@
             <!-- Imagem GELO ICE -->
             <div>
                 <img src="/static/Img/372ba3ab23b82a3d8594faf835be6f257754f636.png" class="logo text-center mb-4"
-                    onclick="window.location.href='/entrega'" style="cursor: pointer;">
+                    onclick="window.location.href='/financeiro'" style="cursor: pointer;">
             </div>
 
             <!-- Entregas -->
-            {% for entrega in entregas %}
+            {% for entrega in entregas if not entrega.pago %}
             <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
                 <div>
                     <strong>Entrega #{{ entrega.id_entrega }}</strong><br>
                     Cliente: {{ entrega.cliente.nome }}<br>
                     Status: {{ entrega.status }}<br>
-                    Pagamento: {% if entrega.pago %}✅ Pago{% else %}❌ Pendente{% endif %}<br>
+                    Pagamento: ❌ Pendente<br>
                     <ul class="mt-2">
                         {% for item in entrega.itens %}
                         <li>{{ item.produto.nome }} — {{ item.quantidade }} unidades</li>
                         {% endfor %}
+                        <br>
+                        
                     </ul>
                 </div>
             </div>
             {% endfor %}
+
 
         </div>
     </div>

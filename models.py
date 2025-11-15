@@ -1,6 +1,11 @@
-from sqlalchemy import Column, Integer, String, DateTime, DECIMAL, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, DECIMAL, Date, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from database import Base
+from datetime import datetime
+
+
+data = Column(DateTime, default=datetime.now)
+
 
 class User(Base):
     __tablename__ = "users"
@@ -23,7 +28,21 @@ class Caixa(Base):
     __tablename__ = "caixas"
 
     id_caixa = Column(Integer, primary_key=True, index=True)
+    numero = Column(String, unique=True, nullable=False)
     valor = Column(DECIMAL(10, 2), nullable=False)
+    volume = Column(DECIMAL(10, 2), nullable=False) 
+    status = Column(String(20), default="disponível")  
+
+class Geladeira(Base):
+    __tablename__ = "geladeiras"
+
+    id_geladeira = Column(Integer, primary_key=True, index=True)
+    numero = Column(String, unique=True, nullable=False)  
+    valor = Column(DECIMAL, nullable=False)
+    marca = Column(String(50), nullable=False)
+    formato = Column(String(50), nullable=False)
+    status = Column(String(20), default="disponível")
+
 
 
 class Produto(Base):
@@ -33,7 +52,7 @@ class Produto(Base):
     nome = Column(String(100), nullable=False)
     preco = Column(DECIMAL(10, 2), nullable=False)
     quantidade = Column(Integer, default=0)
-    tipo = Column(String(50))  #tipos---> "gelo", "saborizado"
+    tipo = Column(String(50)) 
 
 
 class Entrega(Base):
@@ -41,10 +60,12 @@ class Entrega(Base):
 
     id_entrega = Column(Integer, primary_key=True, index=True)
     id_cliente = Column(Integer, ForeignKey("clientes.id_cliente"), nullable=False)
-    status = Column(String(50))
+    status = Column(String(50), default="pago") 
+    pago = Column(Boolean, default=False)          
+    data = Column(DateTime, default=datetime.now)
 
     cliente = relationship("Cliente")
-
+    itens = relationship("ItemEntrega", back_populates="entrega")
 
 
 class ItemEntrega(Base):
@@ -55,7 +76,7 @@ class ItemEntrega(Base):
     id_produto = Column(Integer, ForeignKey("produtos.id_produto"), nullable=False)
     quantidade = Column(Integer, nullable=False)
 
-    entrega = relationship("Entrega")
+    entrega = relationship("Entrega", back_populates="itens")
     produto = relationship("Produto")
 
 class Aluguel(Base):
@@ -66,9 +87,11 @@ class Aluguel(Base):
     data_prevista_devolucao = Column(Date)
     data_entrega = Column(Date)
     id_caixa = Column(Integer, ForeignKey("caixas.id_caixa"), nullable=False)
+    id_geladeira = Column(Integer, ForeignKey("geladeiras.id_geladeira"), nullable=False)
 
     cliente = relationship("Cliente")
     caixa = relationship("Caixa")
+    geladeira = relationship("Geladeira")
 
 class Nota(Base):
     __tablename__ = "notas"

@@ -1,15 +1,18 @@
 from fastapi import FastAPI, Request, Form, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
-from sqlalchemy.orm import Session
+from fastapi.staticfiles import StaticFiles
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, DECIMAL
+from sqlalchemy.orm import Session, relationship
+from datetime import datetime
 from database import SessionLocal
 from auth import AuthUser
-from models import Cliente, Entrega, Produto, ItemEntrega
-from datetime import datetime
+from models import Cliente, Entrega, Produto, ItemEntrega, Aluguel, Geladeira, Caixa
 
 
+data = Column(DateTime, default=datetime.now)
 app = FastAPI()
-from fastapi.staticfiles import StaticFiles
+
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -38,6 +41,7 @@ def login_get(request: Request):
 
 @app.post("/login")
 def login_post(
+    request: Request,
     username: str = Form(...),  # 
     password: str = Form(...),
     db: Session = Depends(get_db)
@@ -58,6 +62,11 @@ def login_post(
 def financeiro(request: Request):
     return templates.TemplateResponse("financeiro-main.html", {"request": request})
 
+@app.get("/financeiro-notas", response_class=HTMLResponse)
+def financeiro_notas(request: Request, db: Session = Depends(get_db)):
+    entregas = db.query(Entrega).order_by(Entrega.data.desc()).all()
+    return templates.TemplateResponse("financeiro-notas.html", {"request": request, "entregas": entregas})
+
 #PÀGINAS ESTOQUE
 
 @app.get("/estoque", response_class=HTMLResponse)
@@ -66,7 +75,7 @@ def estoque(request: Request):
 
 @app.get("/estoque-saborizado", response_class=HTMLResponse)
 def estoque_saborizado(request: Request, db: Session = Depends(get_db)):
-    produtos = db.query(Produto).filter(Produto.tipo == "saborizado").all()
+    produtos = db.query(Produto).filter(Produto.tipo == "saborizado").order_by(Produto.quantidade.desc()).all()
     return templates.TemplateResponse("estoque-gelo-saborizado.html", {"request": request, "produtos": produtos})
 
 
@@ -92,14 +101,33 @@ def entrega(request: Request):
 @app.get("/entregas-registro", response_class=HTMLResponse)
 def entregas_registro(request: Request, db: Session = Depends(get_db)):
     clientes = db.query(Cliente).all()
-    produtos = db.query(Produto).all()
+    produtos = db.query(Produto).order_by(Produto.id_produto.asc()).all()
     return templates.TemplateResponse("entregas-registro.html", {"request": request, "clientes": clientes, "produtos": produtos})
 
 
-@app.get("/entregas-historico", response_class=HTMLResponse)
-def entregas_historico(request: Request):
-    return templates.TemplateResponse("entregas-historico.html", {"request": request})
+@app.get("/entregas-historico")
+def entregas_historico(request: Request, db: Session = Depends(get_db)):
+    entregas = db.query(Entrega).order_by(Entrega.data.desc()).all()
+    return templates.TemplateResponse("entregas-historico.html", {"request": request, "entregas": entregas})
 
+# PÀGINAS ALUGUEIS
+
+@app.get("/alugueis", response_class=HTMLResponse)
+def alugueis(request: Request):
+    return templates.TemplateResponse("alugueis-main.html", {"request": request})
+
+@app.get("/caixas", response_class=HTMLResponse)
+def caixas(request: Request, db: Session = Depends(get_db)):
+    caixas = db.query(Caixa).order_by(Caixa.numero.asc()).all()
+    return templates.TemplateResponse("caixas.html", {"request": request, "caixas": caixas})
+
+@app.get("/geladeiras")
+def listar_geladeiras(request: Request, db: Session = Depends(get_db)):
+    geladeiras = db.query(Geladeira).all()
+    return templates.TemplateResponse(
+        "geladeiras.html",
+        {"request": request, "geladeiras": geladeiras}
+    )
 
 
 # ADICIONAR CLIENTES NO BD
@@ -126,28 +154,28 @@ def adicionar_cliente(
 
 @app.post("/entregas/registrar")
 def registrar_entrega(
+    request: Request,
     id_cliente: int = Form(...),
     nota: str = Form(None),
     pago_na_hora: str = Form(None),
-    db: Session = Depends(get_db),
-    request: Request = None
+    db: Session = Depends(get_db)
 ):
-    # Criar entrega
-    entrega = Entrega(id_cliente=id_cliente, status="registrada")
+
+    status = "nota" if nota == "true" else "normal"
+    pago = True if pago_na_hora == "true" else False
+
+    entrega = Entrega(
+        id_cliente=id_cliente,
+        status=status,
+        pago=pago
+    )
     db.add(entrega)
     db.commit()
     db.refresh(entrega)
 
-    # Capturar produtos entregues
-    produtos = db.query(Produto).all()
-    for produto in produtos:
-        quantidade = int(request.form().get(f"produto_{produto.id_produto}", 0))
-        if quantidade > 0:
-            item = ItemEntrega(id_entrega=entrega.id_entrega, id_produto=produto.id_produto, quantidade=quantidade)
-            db.add(item)
+    # (criação dos itens da entrega...)
 
-    db.commit()
-    return RedirectResponse(url="/entregas-historico", status_code=303)
+    return RedirectResponse("/entregas-historico", status_code=303)
 
 #ADICIONAR ESTOQUE
 
@@ -171,6 +199,41 @@ def adicionar_estoque(
     # Se o produto não for encontrado, volta para a página principal
     return RedirectResponse(url="/estoque", status_code=303)
 
+#ADICIONAR CAIXA
+
+@app.post("/caixas/adicionar")
+def adicionar_caixa(
+    numero: int = Form(...), 
+    valor: float = Form(...), 
+    volume: float = Form(...),
+    status: str = Form(...),
+    db: Session = Depends(get_db)):
+    nova_caixa = Caixa(numero=numero, valor=valor, volume=volume, status=status)
+    db.add(nova_caixa)
+    db.commit()
+    return RedirectResponse("/caixas", status_code=303)
+
+#ADICIONAR FREEZER-
+
+@app.post("/geladeiras/adicionar")
+def adicionar_geladeira(
+    numero: int = Form(...),
+    valor: float = Form(...),
+    marca: str = Form(...),
+    formato: str = Form(...),
+    status: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    nova_geladeira = Geladeira(
+        numero=numero,
+        valor=valor,
+        marca=marca,
+        formato=formato,
+        status=status
+    )
+    db.add(nova_geladeira)
+    db.commit()
+    return RedirectResponse("/geladeiras", status_code=303)
 
 
 

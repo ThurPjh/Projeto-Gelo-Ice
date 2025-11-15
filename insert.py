@@ -5,17 +5,18 @@ from models import Produto
 db = SessionLocal()
 
 
-produto1 = Produto(nome="Cubo 2kg", preco=4.50, quantidade=50, tipo="gelo")
-produto2 = Produto(nome="Cubo 4kg", preco=7.00, quantidade=500, tipo="gelo")
-produto3 = Produto(nome="Cubo 10kg", preco=15.00, quantidade=10, tipo="gelo")
-produto4 = Produto(nome="Barra 10kg", preco=10.00, quantidade=300, tipo="gelo")
+produto8 = Produto(nome="Coco", preco=3.00, quantidade=30, tipo="saborizado")
+produto9 = Produto(nome="Maçã Verde", preco=3.00, quantidade=30, tipo="saborizado")
+produto10 = Produto(nome="Maracujá", preco=3.00, quantidade=30, tipo="saborizado")
+produto11 = Produto(nome="Limão e Gengibre", preco=3.00, quantidade=30, tipo="saborizado")
+produto12 = Produto(nome="Cerveja", preco=3.00, quantidade=30, tipo="saborizado")
+produto13 = Produto(nome="Beats Red Mix", preco=3.00, quantidade=30, tipo="saborizado")
+produto14 = Produto(nome="Beats Sense", preco=3.00, quantidade=30, tipo="saborizado")
+produto15 = Produto(nome="Beats GT", preco=3.00, quantidade=30, tipo="saborizado")
+produto16 = Produto(nome="Laranja", preco=3.00, quantidade=30, tipo="saborizado")
 
 
-produto5 = Produto(nome="Limão", preco=3.00, quantidade=30, tipo="saborizado")
-produto6 = Produto(nome="Morango", preco=3.00, quantidade=30, tipo="saborizado")
-produto7 = Produto(nome="Melancia", preco=3.00, quantidade=30, tipo="saborizado")
 
-
-db.add_all([produto1, produto2, produto3, produto4, produto5, produto6, produto7])
+db.add_all([produto8, produto9, produto10, produto11, produto12, produto13, produto14, produto15, produto16])
 db.commit()
 db.close()
