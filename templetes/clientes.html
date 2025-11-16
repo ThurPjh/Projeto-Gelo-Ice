@@ -13,7 +13,6 @@
         <div class="card p-4 mt-5" style="max-height: 75vh; overflow-y: auto;">
 
 
-
             <!--LOGO-->
 
             <div class="text-center mb-4">
@@ -30,6 +29,7 @@
                     type="button" data-bs-toggle="modal" data-bs-target="#modalAddCliente">
                     <span class="fw-bold">+</span>
                 </button>
+
 
 
                 <!-- Modal de cadastro -->
@@ -56,11 +56,19 @@
                                         <label for="endereco" class="form-label">Endereço</label>
                                         <input type="text" class="form-control" name="endereco">
                                     </div>
+                                    <div class="mb-3">
+                                        <label for="cep" class="form-label">CEP</label>
+                                        <input type="number" class="form-control" name="cep">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="numero" class="form-label">Número Residencial</label>
+                                        <input type="number" class="form-control" name="numero">
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success w-100">Salvar</button>
+                                    </div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-success w-100">Salvar</button>
-                                </div>
-                            </div>
                         </form>
                     </div>
                 </div>
@@ -70,43 +78,47 @@
 
 
             {% for cliente in clientes %}
-            <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
+            <div class="card p-2 mt-3 pe-4" style="background:#1280c9; color:white; border-radius:12px;">
                 <div class="d-flex align-items-center">
                     <img src="/static/Img/clientes.png" class="me-3 icone-gelo">
                     <div class="d-flex flex-column">
                         <strong>{{ cliente.nome }}</strong>
-                        <span class="mb-1">Telefone: {{cliente.telefone}}</span>
-                        <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#info">Mais Informações</button>
+                        <span class="mb-1">Telefone: {{ cliente.telefone }}</span>
+                        <!-- Botão abre modal específico -->
+                        <button class="btn btn-outline-light" data-bs-toggle="modal"
+                            data-bs-target="#info{{ cliente.id_cliente }}">
+                            Mais Informações
+                        </button>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Modal específico para este cliente -->
+            <div class="modal fade" id="info{{ cliente.id_cliente }}" tabindex="-1"
+                aria-labelledby="info{{ cliente.id_cliente }}Label" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="info{{ cliente.id_cliente }}Label">Informações do cliente
+                            </h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p><strong>Cliente:</strong> {{ cliente.nome }}</p>
+                            <p><strong>Telefone:</strong> {{ cliente.telefone }}</p>
+                            <p><strong>Endereço:</strong> {{ cliente.endereco }}</p>
+                            <p><strong>CEP:</strong> {{ cliente.cep }}</p>
+                            <p><strong>Número Residencial:</strong> {{ cliente.numero }}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        </div>
                     </div>
                 </div>
             </div>
             {% endfor %}
 
-            <!-- MOdal informações dos clientes -->
-            <div class="modal fade" id="info" tabindex="-1" aria-labelledby="info"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="info">Informações dos clientes</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            {% for clientes in clientes %}
-                            <p>Cliente: {{ clientes.nome }}</p>
-                            <p>Telefone: {{ clientes.telefone }}</p>
-                            <p>Endereço: {{ clientes.endereco }}</p>
-
-                            {% endfor %}
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Save changes</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
 
         </div>

@@ -34,9 +34,14 @@
                         <li>{{ item.produto.nome }} — {{ item.quantidade }} unidades</li>
                         {% endfor %}
                         <br>
-                        
+
                     </ul>
-                    <button class="botao" style="background-color: #01507a;">Marcar como paga</button>
+                    <form method="post" action="/entregas/{{ entrega.id_entrega }}/pagar">
+                        <button type="submit" class="botao" style="background-color: #01507a; cursor: pointer;">
+                            Marcar como paga
+                        </button>
+                    </form>
+
                 </div>
             </div>
             {% endfor %}

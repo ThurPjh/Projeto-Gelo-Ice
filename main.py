@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session, relationship, joinedload
 from datetime import datetime
 from database import SessionLocal
 from auth import AuthUser
-from models import Cliente, Entrega, Produto, ItemEntrega, Aluguel, Geladeira, Caixa
+from models import Cliente, Entrega, Produto, ItemEntrega, Aluguel, Geladeira, Caixa, Nota
 from typing import Optional
 
 
@@ -142,12 +142,16 @@ def adicionar_cliente(
     nome: str = Form(...),
     telefone: str = Form(""),
     endereco: str = Form(""),
+    cep: int = Form(...),
+    numero: int = Form(...),
     db: Session = Depends(get_db)
 ):
     novo_cliente = Cliente(
         nome=nome,
         telefone=telefone,
         endereco=endereco,
+        cep=cep,
+        numero=numero
     )
     db.add(novo_cliente)
     db.commit()
@@ -164,21 +168,27 @@ async def registrar_entrega(
     pago_na_hora: str = Form(None),
     db: Session = Depends(get_db)
 ):
+    # status da entrega
     status = "nota" if nota == "true" else "normal"
     pago = True if pago_na_hora == "true" else False
 
+    # cria entrega
     entrega = Entrega(id_cliente=id_cliente, status=status, pago=pago)
     db.add(entrega)
     db.commit()
     db.refresh(entrega)
 
-
+    # adiciona itens da entrega e calcula valor total
     form_data = await request.form()
+    valor_total = 0
     for key, value in form_data.items():
         if key.startswith("produto_"):
             id_produto = int(key.replace("produto_", ""))
             quantidade = int(value)
             if quantidade > 0:
+                produto = db.query(Produto).filter(Produto.id_produto == id_produto).first()
+                if produto:
+                    valor_total += float(produto.preco) * quantidade
                 item = ItemEntrega(
                     id_entrega=entrega.id_entrega,
                     id_produto=id_produto,
@@ -187,7 +197,21 @@ async def registrar_entrega(
                 db.add(item)
 
     db.commit()
+
+    # sempre cria uma nota, independente de pago ou não
+    nova_nota = Nota(
+    id_entrega=entrega.id_entrega,
+    id_aluguel=None,  
+    valor=valor_total,
+    status_pagamento="pago" if pago else "pendente"
+    )
+    db.add(nova_nota)
+    db.commit()
+
+
     return RedirectResponse("/entregas-historico", status_code=303)
+
+
 
 
 #ADICIONAR ESTOQUE
@@ -248,7 +272,22 @@ def adicionar_geladeira(
     db.commit()
     return RedirectResponse("/geladeiras", status_code=303)
 
+#MARCAR ENTREGA COMO PAGA
 
+@app.post("/entregas/{id_entrega}/pagar")
+def marcar_como_pago(id_entrega: int, db: Session = Depends(get_db)):
+    entrega = db.query(Entrega).filter(Entrega.id_entrega == id_entrega).first()
+    if entrega:
+        entrega.pago = True
+        entrega.status = "pago"
+
+        # Atualiza também a nota vinculada
+        nota = db.query(Nota).filter(Nota.id_entrega == id_entrega).first()
+        if nota:
+            nota.status_pagamento = "pago"
+
+        db.commit()
+    return RedirectResponse("/entregas-historico", status_code=303)
 
 
 

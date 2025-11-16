@@ -25,7 +25,7 @@ class Cliente(Base):
     endereco = Column(String(150))
     cep = Column(Integer)
     numero = Column(Integer)
-    
+
 class Caixa(Base):
     __tablename__ = "caixas"
 
@@ -99,8 +99,8 @@ class Nota(Base):
     __tablename__ = "notas"
 
     id_nota = Column(Integer, primary_key=True, index=True)
-    id_entrega = Column(Integer, ForeignKey("entregas.id_entrega"), nullable=False)
-    id_aluguel = Column(Integer, ForeignKey("alugueis.id_aluguel"), nullable=False)
+    id_entrega = Column(Integer, ForeignKey("entregas.id_entrega"), nullable=True)
+    id_aluguel = Column(Integer, ForeignKey("alugueis.id_aluguel"), nullable=True) 
     valor = Column(DECIMAL(10, 2), nullable=False)
     status_pagamento = Column(String(50))
 
