@@ -32,9 +32,9 @@
 
             <form method="post" action="/entregas/registrar">
                 <!-- Seleção de cliente -->
-                <div class="mb-3">
+                <div class="mb-3 card p-3" style="background:#1280c9; color:white;">
                     <label for="cliente" class="form-label">Cliente</label>
-                    <select class="form-select" name="id_cliente" required>
+                    <select class="form-select " name="id_cliente" required>
                         {% for cliente in clientes %}
                         <option value="{{ cliente.id_cliente }}">{{ cliente.nome }}</option>
                         {% endfor %}
@@ -44,8 +44,9 @@
                 <!-- Produtos -->
                 <label class="form-label">Produtos</label>
                 <div class="row text-center">
+                    
                     {% for produto in produtos %}
-                    <div class="col-6 mb-3">
+                    <div class="card col-6 mb-3 pb-3 ">
                         <label>{{ produto.nome }}<br>R$ {{ produto.preco }}</label>
                         <input type="number" class="form-control mt-1" name="produto_{{ produto.id_produto }}" min="0"
                             value="0">

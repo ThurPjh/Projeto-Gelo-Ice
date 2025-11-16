@@ -31,7 +31,7 @@
                     <span class="fw-bold">+</span>
                 </button>
 
-                <!-- Modal de cadastro -->
+
                 <!-- Modal de cadastro -->
                 <div class="modal fade" id="modalAddCliente" tabindex="-1" aria-labelledby="modalAddClienteLabel"
                     aria-hidden="true">
@@ -75,10 +75,39 @@
                     <img src="/static/Img/clientes.png" class="me-3 icone-gelo">
                     <div class="d-flex flex-column">
                         <strong>{{ cliente.nome }}</strong>
+                        <span class="mb-1">Telefone: {{cliente.telefone}}</span>
+                        <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#info">Mais Informações</button>
+
                     </div>
                 </div>
             </div>
             {% endfor %}
+
+            <!-- MOdal informações dos clientes -->
+            <div class="modal fade" id="info" tabindex="-1" aria-labelledby="info"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="info">Informações dos clientes</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% for clientes in clientes %}
+                            <p>Cliente: {{ clientes.nome }}</p>
+                            <p>Telefone: {{ clientes.telefone }}</p>
+                            <p>Endereço: {{ clientes.endereco }}</p>
+
+                            {% endfor %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 
         </div>
     </div>

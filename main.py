@@ -3,11 +3,12 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, DECIMAL
-from sqlalchemy.orm import Session, relationship
+from sqlalchemy.orm import Session, relationship, joinedload
 from datetime import datetime
 from database import SessionLocal
 from auth import AuthUser
 from models import Cliente, Entrega, Produto, ItemEntrega, Aluguel, Geladeira, Caixa
+from typing import Optional
 
 
 data = Column(DateTime, default=datetime.now)
@@ -64,7 +65,10 @@ def financeiro(request: Request):
 
 @app.get("/financeiro-notas", response_class=HTMLResponse)
 def financeiro_notas(request: Request, db: Session = Depends(get_db)):
-    entregas = db.query(Entrega).order_by(Entrega.data.desc()).all()
+    entregas = db.query(Entrega).options(
+        joinedload(Entrega.itens).joinedload(ItemEntrega.produto),
+        joinedload(Entrega.cliente)
+    ).order_by(Entrega.data.desc()).all()
     return templates.TemplateResponse("financeiro-notas.html", {"request": request, "entregas": entregas})
 
 #PÀGINAS ESTOQUE
@@ -153,29 +157,38 @@ def adicionar_cliente(
 #REGISTRAR ENTREGA 
 
 @app.post("/entregas/registrar")
-def registrar_entrega(
+async def registrar_entrega(
     request: Request,
     id_cliente: int = Form(...),
     nota: str = Form(None),
     pago_na_hora: str = Form(None),
     db: Session = Depends(get_db)
 ):
-
     status = "nota" if nota == "true" else "normal"
     pago = True if pago_na_hora == "true" else False
 
-    entrega = Entrega(
-        id_cliente=id_cliente,
-        status=status,
-        pago=pago
-    )
+    entrega = Entrega(id_cliente=id_cliente, status=status, pago=pago)
     db.add(entrega)
     db.commit()
     db.refresh(entrega)
 
-    # (criação dos itens da entrega...)
 
+    form_data = await request.form()
+    for key, value in form_data.items():
+        if key.startswith("produto_"):
+            id_produto = int(key.replace("produto_", ""))
+            quantidade = int(value)
+            if quantidade > 0:
+                item = ItemEntrega(
+                    id_entrega=entrega.id_entrega,
+                    id_produto=id_produto,
+                    quantidade=quantidade
+                )
+                db.add(item)
+
+    db.commit()
     return RedirectResponse("/entregas-historico", status_code=303)
+
 
 #ADICIONAR ESTOQUE
 

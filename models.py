@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, DECIMAL, Date, ForeignKey, Boolean
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, joinedload
 from database import Base
 from datetime import datetime
 
@@ -23,7 +23,9 @@ class Cliente(Base):
     nome = Column(String(100), nullable=False)
     telefone = Column(String(20))
     endereco = Column(String(150))
-
+    cep = Column(Integer)
+    numero = Column(Integer)
+    
 class Caixa(Base):
     __tablename__ = "caixas"
 
