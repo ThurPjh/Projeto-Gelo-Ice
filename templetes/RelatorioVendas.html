@@ -68,7 +68,7 @@
             }
 
             try {
-                const response = await fetch(`/Relatorio/VendasResumo/?start_date=${inicio}&end_date=${fim}`);
+                const response = await fetch(`/Relatorio/VendasTotal/?start_date=${inicio}&end_date=${fim}`);
                 const data = await response.json();
 
                 // Exibe os resultados dentro do card

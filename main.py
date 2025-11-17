@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, Form, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, DECIMAL
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, DECIMAL, desc
 from sqlalchemy.orm import Session, relationship, joinedload
 from datetime import datetime
 from database import SessionLocal
@@ -12,6 +12,8 @@ from typing import Optional
 from datetime import date
 from sqlalchemy import func
 import models 
+
+
 
 
 data = Column(DateTime, default=datetime.now)
@@ -73,6 +75,10 @@ def financeiro(request: Request):
 @app.get("/RelatorioVendas", response_class=HTMLResponse)
 def financeiro(request: Request):
     return templates.TemplateResponse("RelatorioVendas.html", {"request": request})
+
+@app.get("/TopClientes", response_class=HTMLResponse)
+def relatorio_clientes(request: Request):
+    return templates.TemplateResponse("RelatorioClientes.html", {"request": request})
 
 @app.get("/financeiro-notas", response_class=HTMLResponse)
 def financeiro_notas(request: Request, db: Session = Depends(get_db)):
@@ -319,5 +325,47 @@ def vendas_resumo(start_date: date, end_date: date, db: Session = Depends(get_db
         "quantidade_vendas": resultado.quantidade_vendas or 0
     }
 
+@app.get("/Relatorio/TopClientes/")
+def top_clientes(start_date: date, end_date: date, db: Session = Depends(get_db)):
+    resultado = (
+        db.query(
+            models.Cliente.nome,
+            func.sum(models.Nota.valor).label("total_gasto")
+        )
+        .join(models.Entrega, models.Cliente.id_cliente == models.Entrega.id_cliente)
+        .join(models.Nota, models.Entrega.id_entrega == models.Nota.id_entrega)
+        .filter(models.Entrega.data >= start_date)
+        .filter(models.Entrega.data <= end_date)
+        .group_by(models.Cliente.id_cliente)
+        .order_by(func.sum(models.Nota.valor).desc())
+        .limit(10)
+        .all()
+    )
+    return [{"nome": r[0], "total_gasto": float(r[1])} for r in resultado]
 
+@app.get("/Relatorio/financeiro-notas/")
+def BuscarNotas(start_date: date, end_date: date,db: Session = Depends(get_db)):
+    ResultadoNotas = (
+        db.query(
+            models.Entrega, models.Nota, models.Cliente
+        )
+        .join(models.Nota, models.Entrega.id_entrega == models.Nota.id_entrega)
+        .join(models.Cliente, models.Cliente.id_cliente == models.Entrega.id_cliente)
+        .filter(models.Entrega.data >= start_date)
+        .filter(models.Entrega.data <= end_date)
+        .order_by(desc(models.Entrega.data))
+        .all()
+        )
+        # transforma cada entrega em um dicionário
+    notas = []
+    for entrega, nota, cliente in ResultadoNotas:
+        notas.append({
+            "id_entrega": entrega.id_entrega,
+            "id_nota": nota.id_nota,
+            "data": entrega.data.isoformat() if entrega.data else None,
+            "cliente": cliente.nome,
+            "valor": float(nota.valor),
+            "status_pagamento": nota.status_pagamento
+        })
 
+    return notas
