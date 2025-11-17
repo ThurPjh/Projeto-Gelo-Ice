@@ -9,6 +9,9 @@ from database import SessionLocal
 from auth import AuthUser
 from models import Cliente, Entrega, Produto, ItemEntrega, Aluguel, Geladeira, Caixa, Nota
 from typing import Optional
+from datetime import date
+from sqlalchemy import func
+import models 
 
 
 data = Column(DateTime, default=datetime.now)
@@ -62,6 +65,14 @@ def login_post(
 @app.get("/financeiro", response_class=HTMLResponse)
 def financeiro(request: Request):
     return templates.TemplateResponse("financeiro-main.html", {"request": request})
+
+@app.get("/Relatorio", response_class=HTMLResponse)
+def financeiro(request: Request):
+    return templates.TemplateResponse("Relatorio.html", {"request": request})
+
+@app.get("/RelatorioVendas", response_class=HTMLResponse)
+def financeiro(request: Request):
+    return templates.TemplateResponse("RelatorioVendas.html", {"request": request})
 
 @app.get("/financeiro-notas", response_class=HTMLResponse)
 def financeiro_notas(request: Request, db: Session = Depends(get_db)):
@@ -272,6 +283,7 @@ def adicionar_geladeira(
     db.commit()
     return RedirectResponse("/geladeiras", status_code=303)
 
+
 #MARCAR ENTREGA COMO PAGA
 
 @app.post("/entregas/{id_entrega}/pagar")
@@ -288,6 +300,24 @@ def marcar_como_pago(id_entrega: int, db: Session = Depends(get_db)):
 
         db.commit()
     return RedirectResponse("/entregas-historico", status_code=303)
+
+@app.get("/Relatorio/VendasTotal/")
+def vendas_resumo(start_date: date, end_date: date, db: Session = Depends(get_db)):
+    resultado = (
+        db.query(
+            func.sum(models.Nota.valor).label("total_sales"),
+            func.count(models.Nota.id_nota).label("quantidade_vendas")
+        )
+        .join(models.Entrega)  # junta com entregas para acessar a data
+        .filter(models.Entrega.data >= start_date)
+        .filter(models.Entrega.data <= end_date)
+        .first()
+    )
+
+    return {
+        "total_sales": resultado.total_sales or 0,
+        "quantidade_vendas": resultado.quantidade_vendas or 0
+    }
 
 
 
