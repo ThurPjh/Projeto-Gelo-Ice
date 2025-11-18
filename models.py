@@ -45,6 +45,9 @@ class Geladeira(Base):
     formato = Column(String(50), nullable=False)
     status = Column(String(20), default="disponível")
 
+    id_cliente = Column(Integer, ForeignKey("clientes.id_cliente"), nullable=True)
+    cliente = relationship("Cliente")
+
 
 
 class Produto(Base):

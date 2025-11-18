@@ -16,10 +16,8 @@
 
             <!-- Logo -->
             <div>
-                <img src="/static/Img/372ba3ab23b82a3d8594faf835be6f257754f636.png" 
-                     class="logo text-center mb-4"
-                     onclick="window.location.href='/alugueis'" 
-                     style="cursor: pointer;">
+                <img src="/static/Img/372ba3ab23b82a3d8594faf835be6f257754f636.png" class="logo text-center mb-4"
+                    onclick="window.location.href='/alugueis'" style="cursor: pointer;">
             </div>
 
             <!-- Botão para abrir o modal -->
@@ -28,8 +26,8 @@
             </button>
 
             <!-- Modal de adicionar geladeira -->
-            <div class="modal fade" id="modalAdicionarGeladeira" tabindex="-1" aria-labelledby="modalAdicionarGeladeiraLabel"
-                aria-hidden="true">
+            <div class="modal fade" id="modalAdicionarGeladeira" tabindex="-1"
+                aria-labelledby="modalAdicionarGeladeiraLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <form method="post" action="/geladeiras/adicionar">
                         <div class="modal-content">
@@ -82,16 +80,85 @@
             {% for geladeira in geladeiras %}
             <div class="card mb-3 p-2" style="background: #1280c9; color: white; border-radius: 12px;">
                 <div class="d-flex align-items-center">
-                    <img src="/static/Img/caixas.png" class="me-3 icone-gelo">
+                    <img src="/static/Img/Geladeira-exemplo.png" class="me-3 icone-gelo">
                     <div class="flex-grow-1">
                         <strong>Número: {{ geladeira.numero }}</strong><br>
-                        Marca: {{ geladeira.marca }}<br>
-                        Formato: {{ geladeira.formato }}<br>
-                        Status: {{ geladeira.status }}<br>
-                        R$ <span>{{ "%.2f"|format(geladeira.valor) }}</span>
+                        Cliente: {% if geladeira.status == "não disponível" %} {{geladeira.cliente.nome}} {% else %} Nenhum
+                        {% endif %}<br>
+
+                        <button class="btn btn-outline-light mt-2" data-bs-toggle="modal"
+                            data-bs-target="#atribuir-cliente-{{ geladeira.id_geladeira }}">
+                            Atribuir Cliente
+                        </button>
+
+                        <button class="btn btn-outline-light mt-2" data-bs-toggle="modal"
+                            data-bs-target="#mais-info-{{ geladeira.id_geladeira }}">
+                            Mais Informações
+                        </button>
+
                     </div>
                 </div>
             </div>
+
+            <!-- Modal para modificar o cliente -->
+            <div class="modal fade" id="atribuir-cliente-{{ geladeira.id_geladeira }}" tabindex="-1"
+                aria-labelledby="atribuirClienteLabel-{{ geladeira.id_geladeira }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="atribuirClienteLabel-{{ geladeira.id_geladeira }}">
+                                Modificar Cliente
+                            </h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
+                        </div>
+
+                        <!-- Aqui entra o formulário -->
+                        <form method="post" action="/geladeiras/atribuir">
+                            <input type="hidden" name="id_geladeira" value="{{ geladeira.id_geladeira }}">
+                            <div class="modal-body">
+                                <select name="id_cliente" class="form-select">
+                                    {% for cliente in clientes %}
+                                    <option value="{{ cliente.id_cliente }}">{{ cliente.nome }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-success">Salvar</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Modal de mais informações -->
+            <div class="modal fade" id="mais-info-{{ geladeira.id_geladeira }}" tabindex="-1"
+                aria-labelledby="maisInfoLabel-{{ geladeira.id_geladeira }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="maisInfoLabel-{{ geladeira.id_geladeira }}">
+                                Mais Informações
+                            </h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            Número: {{ geladeira.numero }}<br>
+                            Marca: {{ geladeira.marca }}<br>
+                            Formato: {{ geladeira.formato }}<br>
+                            Cliente: {% if geladeira.cliente %} {{ geladeira.cliente.nome }} {% else %} Nenhum {% endif
+                            %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {% endfor %}
 
         </div>
@@ -99,6 +166,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
-    </script>
+        </script>
 </body>
+
 </html>

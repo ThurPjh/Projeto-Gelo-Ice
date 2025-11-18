@@ -104,7 +104,7 @@ def estoque_gelo(request: Request, db: Session = Depends(get_db)):
 
 @app.get("/clientes", response_class=HTMLResponse)
 def clientes(request: Request, db: Session = Depends(get_db)):
-    lista_clientes = db.query(Cliente).all()
+    lista_clientes = db.query(Cliente).order_by(Cliente.nome.asc()).all()
     return templates.TemplateResponse("clientes.html", {"request": request, "clientes": lista_clientes})
 
 #PÀGINAS ENTREGAS
@@ -138,10 +138,11 @@ def caixas(request: Request, db: Session = Depends(get_db)):
 
 @app.get("/geladeiras")
 def listar_geladeiras(request: Request, db: Session = Depends(get_db)):
-    geladeiras = db.query(Geladeira).all()
+    geladeiras = db.query(Geladeira).order_by(Geladeira.numero.asc()).all()
+    clientes = db.query(Cliente).all()
     return templates.TemplateResponse(
         "geladeiras.html",
-        {"request": request, "geladeiras": geladeiras}
+        {"request": request, "geladeiras": geladeiras, "clientes": clientes}
     )
 
 
@@ -238,13 +239,12 @@ def adicionar_estoque(
         produto.quantidade += quantidade
         db.commit()
 
-        # Redireciona para a página correta com base no tipo
+
         if produto.tipo == "saborizado":
             return RedirectResponse(url="/estoque-saborizado", status_code=303)
         else:
             return RedirectResponse(url="/estoque-gelo", status_code=303)
 
-    # Se o produto não for encontrado, volta para a página principal
     return RedirectResponse(url="/estoque", status_code=303)
 
 #ADICIONAR CAIXA
@@ -282,6 +282,23 @@ def adicionar_geladeira(
     db.add(nova_geladeira)
     db.commit()
     return RedirectResponse("/geladeiras", status_code=303)
+
+#ATRIBUIR CLIENTE A GELADEIRA
+
+@app.post("/geladeiras/atribuir")
+def atribuir_cliente(
+    id_geladeira: int = Form(...),
+    id_cliente: int = Form(...),
+    db: Session = Depends(get_db)
+):
+    geladeira = db.query(Geladeira).filter(Geladeira.id_geladeira == id_geladeira).first()
+    cliente = db.query(Cliente).filter(Cliente.id_cliente == id_cliente).first()
+    if geladeira and cliente:
+        geladeira.id_cliente = cliente.id_cliente
+        geladeira.status = "não disponível"
+        db.commit()
+    return RedirectResponse("/geladeiras", status_code=303)
+
 
 
 #MARCAR ENTREGA COMO PAGA
