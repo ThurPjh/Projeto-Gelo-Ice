@@ -75,6 +75,10 @@ def financeiro(request: Request):
 def financeiro(request: Request):
     return templates.TemplateResponse("RelatorioVendas.html", {"request": request})
 
+@app.get("/RelatorioProdutos", response_class=HTMLResponse)
+def financeiro(request: Request):
+    return templates.TemplateResponse("RelatorioProdutos.html", {"request": request})
+
 @app.get("/TopClientes", response_class=HTMLResponse)
 def relatorio_clientes(request: Request):
     return templates.TemplateResponse("RelatorioClientes.html", {"request": request})
@@ -441,22 +445,50 @@ def top_clientes(start_date: date, end_date: date, db: Session = Depends(get_db)
     )
     return [{"nome": r[0], "total_gasto": float(r[1])} for r in resultado]
 
+@app.get("/Relatorio/RelatorioProdutos")
+def BuscarProdutos(start_date: date, end_date: date,db: Session = Depends(get_db)):
+    resultado =  (
+    db.query(
+        models.Produto.nome,
+        func.count(models.Produto.id_produto).label("quantidade"),
+        func.sum(models.Produto.preco).label("total")
+    )
+    .join(models.ItemEntrega, models.ItemEntrega.id_produto == models.Produto.id_produto)
+    .join(models.Entrega, models.Entrega.id_entrega == models.ItemEntrega.id_entrega)
+    .filter(models.Entrega.data >= start_date, models.Entrega.data <= end_date)
+    .group_by(models.Produto.nome)
+    .all()
+)
+
+    dados = [
+        {"nome": r[0], "quantidade": r[1], "total": float(r[2])}
+        for r in resultado
+    ]
+    return dados
+
 @app.get("/Relatorio/financeiro-notas/")
-def BuscarNotas(start_date: date, end_date: date,db: Session = Depends(get_db)):
-    ResultadoNotas = (
-        db.query(
-            models.Entrega, models.Nota, models.Cliente
-        )
+def BuscarNotas(
+    start_date: date,
+    end_date: date,
+    apenas_nao_pagas: bool = False,
+    db: Session = Depends(get_db)
+):
+    query = (
+        db.query(models.Entrega, models.Nota, models.Cliente)
         .join(models.Nota, models.Entrega.id_entrega == models.Nota.id_entrega)
         .join(models.Cliente, models.Cliente.id_cliente == models.Entrega.id_cliente)
         .filter(models.Entrega.data >= start_date)
         .filter(models.Entrega.data <= end_date)
         .order_by(desc(models.Entrega.data))
-        .all()
-        )
-        # transforma cada entrega em um dicionário
+    )
+
+    if apenas_nao_pagas:
+        query = query.filter(models.Entrega.pago == False)
+
+    resultado = query.all()
+
     notas = []
-    for entrega, nota, cliente in ResultadoNotas:
+    for entrega, nota, cliente in resultado:
         notas.append({
             "id_entrega": entrega.id_entrega,
             "id_nota": nota.id_nota,

@@ -51,7 +51,10 @@
                     </div>
                 </div>
             </div>
+
+
         </div>
+    </div>
     </div>
 
     <!-- Bootstrap JS -->
@@ -59,7 +62,6 @@
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
-    <!-- Script para buscar relatório -->
     <script>
         async function buscarRelatorio() {
             const inicio = document.getElementById("data_inicio").value;
@@ -74,7 +76,6 @@
                 const response = await fetch(`/Relatorio/VendasTotal/?start_date=${inicio}&end_date=${fim}`);
                 const data = await response.json();
 
-                // Exibe os resultados dentro do card
                 document.getElementById("valor_total").textContent = data.total_sales ?? 0;
                 document.getElementById("quantidade_vendas").textContent = data.quantidade_vendas ?? 0;
                 document.getElementById("resultado").classList.remove("d-none");

@@ -40,6 +40,13 @@
                         <div class="mb-3 text-center">
                             <button class="btn btn-primary" onclick="BuscarNotas()">Buscar Relatório</button>
                         </div>
+                        <!-- checkbox -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                            <label class="form-check-label" for="flexCheckChecked">
+                                Apenas nao pagas
+                            </label>
+                        </div>
 
                     </div>
                 </div>
@@ -81,7 +88,8 @@
                 return;
             }
             try {
-                const response = await fetch(`/Relatorio/financeiro-notas/?start_date=${inicio}&end_date=${fim}`, { method: "GET" })
+                const apenasNaoPagas = document.getElementById("flexCheckChecked").checked;
+                const response = await fetch(`/Relatorio/financeiro-notas/?start_date=${inicio}&end_date=${fim}&apenas_nao_pagas=${apenasNaoPagas}`, { method: "GET" })
                 if (!response.ok) throw new Error("Erro HTTP " + response.status);
                 const notas = await response.json();
                 const tabela = document.getElementById("tabela-notas").querySelector("tbody");
