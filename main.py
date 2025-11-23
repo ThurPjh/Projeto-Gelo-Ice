@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Form, Depends
+from fastapi import FastAPI, Request, Form, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -37,7 +37,6 @@ def get_db():
 @app.get("/", response_class=HTMLResponse)
 def inicio(request: Request):
     return templates.TemplateResponse("inicio.html", {"request": request})
-
 
 
 @app.get("/login", response_class=HTMLResponse)
@@ -181,7 +180,14 @@ def entregas_registro(request: Request, db: Session = Depends(get_db)):
 @app.get("/entregas-historico")
 def entregas_historico(request: Request, db: Session = Depends(get_db)):
     entregas = db.query(Entrega).order_by(Entrega.data.desc()).all()
-    return templates.TemplateResponse("entregas-historico.html", {"request": request, "entregas": entregas})
+    notas = db.query(Nota).options(
+    joinedload(Nota.entrega).joinedload(Entrega.cliente)).all()
+
+    return templates.TemplateResponse("entregas-historico.html", {
+        "request": request, 
+        "entregas": entregas,
+        "notas": notas
+        })
 
 # PÀGINAS ALUGUEIS
 
@@ -240,10 +246,8 @@ async def registrar_entrega(
     pago_na_hora: str = Form(None),
     db: Session = Depends(get_db)
 ):
-   
-
     # status da entrega
-    status = "nota" if nota == "true" else "normal"
+    status = "nota" if nota == "true" else "pago"
     pago = True if pago_na_hora == "true" else False
 
     # cria entrega
@@ -255,14 +259,24 @@ async def registrar_entrega(
     # adiciona itens da entrega e calcula valor total
     form_data = await request.form()
     valor_total = 0
+
     for key, value in form_data.items():
         if key.startswith("produto_"):
             id_produto = int(key.replace("produto_", ""))
             quantidade = int(value)
+
             if quantidade > 0:
                 produto = db.query(Produto).filter(Produto.id_produto == id_produto).first()
-                if produto:
-                    valor_total += float(produto.preco) * quantidade
+                if not produto:
+                    continue 
+
+                
+                if produto.quantidade < quantidade:
+                    raise HTTPException(status_code=400, detail=f"Estoque insuficiente para {produto.nome}")
+
+                valor_total += float(produto.preco) * quantidade
+
+                # cria item da entrega
                 item = ItemEntrega(
                     id_entrega=entrega.id_entrega,
                     id_produto=id_produto,
@@ -270,22 +284,20 @@ async def registrar_entrega(
                 )
                 db.add(item)
 
-    db.commit()
+                # baixa no estoque
+                produto.quantidade -= quantidade
 
-    # sempre cria uma nota, independente de pago ou não
+    #  passa o registro para a tabela nota
     nova_nota = Nota(
-    id_entrega=entrega.id_entrega,
-    id_aluguel=None,  
-    valor=valor_total,
-    status_pagamento="pago" if pago else "pendente"
-    )
+        id_entrega=entrega.id_entrega,
+        valor=valor_total,
+        status_pagamento="pendente" if not pago else "pago"
+        )
     db.add(nova_nota)
+
     db.commit()
 
-    
-
-
-    return RedirectResponse("/entregas-historico", status_code=303)
+    return RedirectResponse(url="/entregas-historico", status_code=303)
 
 #MARCAR NOTA COMO PAGA
 

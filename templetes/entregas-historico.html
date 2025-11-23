@@ -15,6 +15,8 @@
     <div class="container my-4" style="max-width: 380px;">
         <div class="card p-4 mt-5" style="max-height: 75vh; overflow-y: auto;">
 
+            <img  class="voltar" src="/static/Img/voltar.png" onclick="window.location.href='/entrega'" style="cursor: pointer; position: absolute; top: 20px; left: 20px;" alt="Voltar">
+
             <!-- Imagem GELO ICE -->
             <div>
                 <img src="/static/Img/372ba3ab23b82a3d8594faf835be6f257754f636.png" class="logo text-center mb-4"
@@ -23,12 +25,22 @@
 
             <!-- Entregas -->
             {% for entrega in entregas %}
+
             <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
                 <div>
                     <strong>Entrega #{{ entrega.id_entrega }}</strong><br>
                     Cliente: {{ entrega.cliente.nome }}<br>
-                    Status: {{ entrega.status }}<br>
-                    Pagamento: {% if entrega.pago %}✅ Pago{% else %}❌ Pendente{% endif %}<br>
+                    Nota ou pago: {{ entrega.status }}<br>
+
+                    {% for nota in entrega.notas %}
+                    {% if nota.status_pagamento == "pago" %}
+                        Status: ✅ Paga
+                    {% else %}
+                        Status: ❌ Pendente
+                    {% endif %}
+                    {% endfor %}
+
+
                     <ul class="mt-2">
                         {% for item in entrega.itens %}
                         <li>{{ item.produto.nome }} — {{ item.quantidade }} unidades</li>
@@ -36,6 +48,7 @@
                     </ul>
                 </div>
             </div>
+
             {% endfor %}
 
         </div>
