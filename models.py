@@ -21,6 +21,7 @@ class Cliente(Base):
 
     id_cliente = Column(Integer, primary_key=True, index=True)
     nome = Column(String(100), nullable=False)
+    cnpj = Column(String(20), unique=True, nullable=False)
     telefone = Column(String(20))
     endereco = Column(String(150))
     cep = Column(Integer)
@@ -71,6 +72,7 @@ class Entrega(Base):
 
     cliente = relationship("Cliente")
     itens = relationship("ItemEntrega", back_populates="entrega")
+    notas = relationship("Nota", back_populates="entrega")
 
 
 class ItemEntrega(Base):
@@ -107,7 +109,7 @@ class Nota(Base):
     valor = Column(DECIMAL(10, 2), nullable=False)
     status_pagamento = Column(String(50))
 
-    entrega = relationship("Entrega")
+    entrega = relationship("Entrega", back_populates="notas")
     aluguel = relationship("Aluguel")
 
 

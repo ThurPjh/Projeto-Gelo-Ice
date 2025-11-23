@@ -7,7 +7,8 @@
     <title>Estoque</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/Img/style.css">
+
 
 </head>
 
@@ -74,10 +75,10 @@
                     <img src="/static/Img/caixas.png" class="me-3 icone-gelo">
                     <div class="flex-grow-1">
                         <strong><span>Número: </span>{{ caixa.numero }}</strong><br>
-                       Volume: {{(caixa.volume) }} L<br>
+                        Volume: {{(caixa.volume) }} L<br>
                         Status: {{ caixa.status}}<br>
                         R$ <span>{{"%.2f"|format( caixa.valor) }}</span>
-                    </div> 
+                    </div>
                 </div>
             </div>
             {% endfor %}

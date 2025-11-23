@@ -6,12 +6,8 @@
     <title>Registrar Entrega - Gelo ICE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- ESSENCIAL para mobile -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/Img/style.css">
     <style>
-        body {
-            background-color: #f8f9fa;
-        }
-
         .scroll-card {
             height: 75vh;
             overflow-y: auto;
@@ -32,40 +28,65 @@
 
             <form method="post" action="/entregas/registrar">
                 <!-- Seleção de cliente -->
-                <div class="mb-3 card p-3" style="background:#1280c9; color:white;">
-                    <label for="cliente" class="form-label">Cliente</label>
-                    <select class="form-select " name="id_cliente" required>
-                        {% for cliente in clientes %}
-                        <option value="{{ cliente.id_cliente }}">{{ cliente.nome }}</option>
-                        {% endfor %}
-                    </select>
+                <div class="menu-card">
+                    <div class="card-body botao">
+                        <div class="card-title" style="text-align: center;">Clientes</div>
+                        <div class="mb-3 p-2">
+                            <select class="form-select " name="id_cliente" required>
+                                {% for cliente in clientes %}
+                                <option value="{{ cliente.id_cliente }}">{{ cliente.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Produtos -->
-                <label class="form-label">Produtos</label>
                 <div class="row text-center">
-                    
-                    {% for produto in produtos %}
-                    <div class="card col-6 mb-3 pb-3 ">
-                        <label>{{ produto.nome }}<br>R$ {{ produto.preco }}</label>
-                        <input type="number" class="form-control mt-1" name="produto_{{ produto.id_produto }}" min="0"
-                            value="0">
+
+                    <div class="menu-card botao">
+                        <div class="card-body">
+                            <h5 class="card-title">Pacotes de Gelos</h5>
+                            {% for produto in produtos %}
+                            {% if produto.tipo == 'gelo' %}
+                            <div class="card mb-3 pb-2">
+                                <label>{{ produto.nome }}<br>R$ {{ produto.preco }}</label>
+                                <input type="number" style="border-style: none;" class="form-control mt-1" name="produto_{{ produto.id_produto }}"
+                                    min="0" value="0">
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+
                     </div>
-                    {% endfor %}
-                </div>
 
-                <!-- Opções adicionais -->
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" name="nota" value="true" id="nota">
-                    <label class="form-check-label" for="nota">Nota</label>
-                </div>
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" name="pago_na_hora" value="true" id="pago_na_hora">
-                    <label class="form-check-label" for="pago_na_hora">Pago na hora</label>
-                </div>
+                    <div class="menu-card botao">
+                        <div class="card-body">
+                            <h5 class="card-title">Gelos Saborizados</h5>
+                            {% for produto in produtos %}
+                            {% if produto.tipo != 'gelo' %}
+                            <div class="card mb-3">
+                                <label>{{ produto.nome }}<br>R$ {{ produto.preco }}</label>
+                                <input type="number" style="border-style: none;" class="form-control mt-1" name="produto_{{ produto.id_produto }}"
+                                    min="0" value="0">
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <!-- Opções nota ou paga -->
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="nota" value="true" id="nota">
+                        <label class="form-check-label" for="nota">Nota</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="pago_na_hora" value="true"
+                            id="pago_na_hora">
+                        <label class="form-check-label" for="pago_na_hora">Pago na hora</label>
+                    </div>
 
-                <!-- Botão de registrar -->
-                <button type="submit" class="btn btn-primary w-100">Registrar</button>
+                    <!-- Botão de registrar -->
+                    <button type="submit" class="botao w-100">Registrar</button>
             </form>
 
         </div>

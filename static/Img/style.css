@@ -37,6 +37,13 @@
     height: auto;
 }
 
+.voltar {
+        display: block;
+        width: 30px;
+        cursor: pointer;
+        opacity: 0.4;
+    }
+
 .caixa {
     border-radius: 8px;
     padding: 10px;
@@ -53,6 +60,8 @@
     border-radius: 8px;
     cursor: pointer;
 }
+
+
 
 .padd {
     margin-top: 25px;

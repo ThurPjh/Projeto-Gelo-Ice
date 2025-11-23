@@ -111,7 +111,59 @@ def estoque_gelo(request: Request, db: Session = Depends(get_db)):
 @app.get("/clientes", response_class=HTMLResponse)
 def clientes(request: Request, db: Session = Depends(get_db)):
     lista_clientes = db.query(Cliente).order_by(Cliente.nome.asc()).all()
-    return templates.TemplateResponse("clientes.html", {"request": request, "clientes": lista_clientes})
+    entregas = db.query(Entrega).all()
+
+    # carrega notas junto com entrega e cliente
+    notas = db.query(Nota).options(
+        joinedload(Nota.entrega).joinedload(Entrega.cliente)
+    ).all()
+
+    # formatar data de entrega 
+    for nota in notas:
+        if nota.entrega:
+            nota.data_formatada = nota.entrega.data.strftime("%d/%m/%Y %H:%M")
+
+
+
+    # calcula quantidade de notas pendentes por cliente
+    pendentes = (
+        db.query(Cliente.id_cliente, func.count(Nota.id_nota))
+        .join(Entrega, Entrega.id_cliente == Cliente.id_cliente)
+        .join(Nota, Nota.id_entrega == Entrega.id_entrega)
+        .filter(Nota.status_pagamento == "pendente")
+        .group_by(Cliente.id_cliente)
+        .all()
+    )
+    notas_clientes = {cliente_id: qtd for cliente_id, qtd in pendentes}
+
+     # total geral de notas por cliente
+    totais_clientes = {}
+    totais_pendentes = {}
+    for cliente in lista_clientes:
+        total = sum(
+            nota.valor for nota in notas
+            if nota.entrega and nota.entrega.id_cliente == cliente.id_cliente
+        )
+        total_pendente = sum(
+            nota.valor for nota in notas
+            if nota.entrega and nota.entrega.id_cliente == cliente.id_cliente and nota.status_pagamento == "pendente"
+        )
+        totais_clientes[cliente.id_cliente] = total
+        totais_pendentes[cliente.id_cliente] = total_pendente
+
+    return templates.TemplateResponse(
+        "clientes.html",
+        {
+            "request": request,
+            "clientes": lista_clientes,
+            "entregas": entregas,
+            "notas": notas,
+            "notas_clientes": notas_clientes,
+            "totais_pendentes": totais_pendentes,
+            "totais_clientes": totais_clientes
+        }
+    )
+
 
 #PÀGINAS ENTREGAS
 
@@ -158,6 +210,7 @@ def listar_geladeiras(request: Request, db: Session = Depends(get_db)):
 @app.post("/clientes/adicionar")
 def adicionar_cliente(
     nome: str = Form(...),
+    cnpj: str = Form(...),
     telefone: str = Form(""),
     endereco: str = Form(""),
     cep: int = Form(...),
@@ -166,6 +219,7 @@ def adicionar_cliente(
 ):
     novo_cliente = Cliente(
         nome=nome,
+        cnpj=cnpj,
         telefone=telefone,
         endereco=endereco,
         cep=cep,
@@ -186,6 +240,8 @@ async def registrar_entrega(
     pago_na_hora: str = Form(None),
     db: Session = Depends(get_db)
 ):
+   
+
     # status da entrega
     status = "nota" if nota == "true" else "normal"
     pago = True if pago_na_hora == "true" else False
@@ -226,8 +282,21 @@ async def registrar_entrega(
     db.add(nova_nota)
     db.commit()
 
+    
+
 
     return RedirectResponse("/entregas-historico", status_code=303)
+
+#MARCAR NOTA COMO PAGA
+
+@app.post("/notas/{id_nota}/pagar")
+def marcar_nota_como_paga(id_nota: int, db: Session = Depends(get_db)):
+    nota = db.query(Nota).filter(Nota.id_nota == id_nota).first()
+    if nota:
+        nota.status_pagamento = "pago"
+        db.commit()
+    return RedirectResponse(url="/clientes", status_code=303)
+
 
 
 
