@@ -12,49 +12,69 @@
 
 <body>
     <div class="container-fluid">
-        <div class="row justify-content-center align-items-center">
-            <!-- Fundo azul visível apenas em telas médias ou maiores -->
-            <div class="col-md-12 d-none d-md-block bg-azul position-absolute top-0 start-0"></div>
 
-            <!-- Card branco sempre visível -->
-            <div class="col-10 col-md-4 z-1">
-                <div class="card p-4 mt-5 bg-white">
+        <div class="col-12">
+            <div class="row justify-content-center align-items-center" style="max-height: 75vh;">
+                <!-- Fundo azul visível apenas em telas médias ou maiores -->
+                <div class="col-md-12 d-none d-md-block bg-azul position-absolute top-0 start-0"></div>
 
-                    <img  class="voltar" src="/static/Img/voltar.png" onclick="window.location.href='/Relatorio'" style="cursor: pointer; position: absolute; top: 20px; left: 20px;" alt="Voltar">
+                <!-- Card branco sempre visível -->
+                <div class="col-10 col-md-4 z-1">
+                    <div class="card p-4 mt-5 bg-white">
 
-                    <div class="text-center mb-4">
-                        <img src="/static/Img/372ba3ab23b82a3d8594faf835be6f257754f636.png" class="logo"
-                            onclick="window.location.href='/'" style="cursor: pointer;">
+                        <img class="voltar" src="/static/Img/voltar.png" onclick="window.location.href='/Relatorio'"
+                            style="cursor: pointer; position: absolute; top: 20px; left: 20px;" alt="Voltar">
+
+                        <div class="text-center mb-4">
+                            <img src="/static/Img/372ba3ab23b82a3d8594faf835be6f257754f636.png" class="logo"
+                                onclick="window.location.href='/'" style="cursor: pointer;">
+                        </div>
+
+                        <form method="get" action="/Relatorio/VendasTotal/">
+                            <div class="mb-3">
+                                <label class="form-label">Data inicial</label>
+                                <input type="date" class="form-control" name="start_date" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Data final</label>
+                                <input type="date" class="form-control" name="end_date" required>
+                            </div>
+
+                            <div class="mb-3 text-center">
+                                <button class="btn btn-primary" type="submit">Buscar Relatório</button>
+                            </div>
+                        </form>
+
+                        {% if resultado %}
+                        <div class="alert alert-info text-center">
+                            <p>Receita total: R$ {{ resultado.total_sales }}</p>
+                            <p>Quantidade de entregas: {{ resultado.quantidade_vendas }}</p>
+                        </div>
+
+                        <h5 class="mt-4">Entregas no período:</h5>
+                        <ul>
+                            {% for nota, entrega, nome_cliente in registros %}
+                            <li>
+                                Cliente: {{ nome_cliente }} <br>
+                                Status da Nota: {{ nota.status_pagamento }} <br>
+                                Valor: {{ nota.valor }} <br>
+                                Data: {{ entrega.data_formatada }}
+                            </li>
+                            <br>
+                            {% endfor %}
+                        </ul>
+
+                        {% endif %}
+
+
+
                     </div>
 
-                    <!-- Campo Data inicial -->
-                    <div class="mb-3">
-                        <label class="form-label">Data inicial</label>
-                        <input type="date" class="form-control" id="data_inicio">
-                    </div>
 
-                    <!-- Campo Data final -->
-                    <div class="mb-3">
-                        <label class="form-label">Data final</label>
-                        <input type="date" class="form-control" id="data_fim">
-                    </div>
-
-                    <!-- Botão -->
-                    <div class="mb-3 text-center">
-                        <button class="btn btn-primary" onclick="buscarRelatorio()">Buscar Relatório</button>
-                    </div>
-
-                    <!-- Resultado -->
-                    <div class="alert alert-info text-center d-none" id="resultado">
-                        <p>Total de vendas: <span id="valor_total"></span></p>
-                        <p>Quantidade de vendas: <span id="quantidade_vendas"></span></p>
-                    </div>
                 </div>
             </div>
-
-
         </div>
-    </div>
     </div>
 
     <!-- Bootstrap JS -->

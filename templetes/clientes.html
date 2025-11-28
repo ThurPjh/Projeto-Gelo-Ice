@@ -155,11 +155,25 @@
                                             </td>
 
                                         </tr>
+
+                                        <tr>
+                                            <td colspan="4" >
+                                                <strong>Produtos dessa nota:</strong>
+                                                <ul>
+                                                    {% for item in nota.entrega.itens %}
+                                                    <li>{{ item.produto.nome }} - Quantidade: {{ item.quantidade }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </td>
+                                        </tr>
+
                                         {% endif %}
                                         {% endif %}
                                         {% endfor %}
                                     </tbody>
                                 </table>
+
+                                
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>

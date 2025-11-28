@@ -109,6 +109,19 @@ def estoque_gelo(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse("estoque-gelo.html", {"request": request, "produtos": produtos})
 
 
+def gerar_mensagem(cliente_nome, notas_em_aberto, itens, total, data=None):
+    mensagem = "*Mensagem automática*\n"
+    mensagem += f"Boa tarde, {cliente_nome}!\n\n"
+    mensagem += f"Você possui {notas_em_aberto} nota(s) em aberto conosco.\n\n"
+    
+    if data:
+        mensagem += f"{data}  {itens} -> R$ {total}\n\n"
+    else:
+        mensagem += f"{itens} -> R$ {total}\n\n"
+    
+    mensagem += f"Total a pagar: R$ {total}"
+    return mensagem
+
 #PÀGINAS CLIENTES
 
 @app.get("/clientes", response_class=HTMLResponse)
@@ -409,23 +422,54 @@ def marcar_como_pago(id_entrega: int, db: Session = Depends(get_db)):
         db.commit()
     return RedirectResponse("/entregas-historico", status_code=303)
 
+
+
+# RELATORIO DE VENDAS COM ESCOLHA DE DATA
+
 @app.get("/Relatorio/VendasTotal/")
-def vendas_resumo(start_date: date, end_date: date, db: Session = Depends(get_db)):
+def vendas_resumo(
+    request: Request,
+    start_date: date,
+    end_date: date,
+    db: Session = Depends(get_db)
+):
+    # resumo de vendas
     resultado = (
         db.query(
             func.sum(models.Nota.valor).label("total_sales"),
             func.count(models.Nota.id_nota).label("quantidade_vendas")
         )
-        .join(models.Entrega)  # junta com entregas para acessar a data
-        .filter(models.Entrega.data >= start_date)
-        .filter(models.Entrega.data <= end_date)
+        .join(models.Entrega, models.Nota.id_entrega == models.Entrega.id_entrega)
+        .filter(func.date(models.Entrega.data) >= start_date)
+        .filter(func.date(models.Entrega.data) <= end_date)
         .first()
     )
 
-    return {
+    # lista com Nota + Entrega + Cliente
+    registros = (
+        db.query(models.Nota, models.Entrega, models.Cliente.nome)
+        .join(models.Entrega, models.Nota.id_entrega == models.Entrega.id_entrega)
+        .join(models.Cliente, models.Entrega.id_cliente == models.Cliente.id_cliente)
+        .filter(func.date(models.Entrega.data) >= start_date)
+        .filter(func.date(models.Entrega.data) <= end_date)
+        .all()
+    )
+
+    # formatar data
+    for nota, entrega, cliente_nome in registros:
+        if entrega and entrega.data:
+            entrega.data_formatada = entrega.data.strftime("%d/%m/%Y %H:%M")
+
+    dados = {
         "total_sales": resultado.total_sales or 0,
         "quantidade_vendas": resultado.quantidade_vendas or 0
     }
+
+    return templates.TemplateResponse(
+        "RelatorioVendas.html",
+        {"request": request, "resultado": dados, "registros": registros}
+    )
+
 
 @app.get("/Relatorio/TopClientes/")
 def top_clientes(start_date: date, end_date: date, db: Session = Depends(get_db)):
@@ -499,3 +543,5 @@ def BuscarNotas(
         })
 
     return notas
+
+
