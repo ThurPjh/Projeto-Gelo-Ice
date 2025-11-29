@@ -471,44 +471,87 @@ def vendas_resumo(
     )
 
 
-@app.get("/Relatorio/TopClientes/")
-def top_clientes(start_date: date, end_date: date, db: Session = Depends(get_db)):
+@app.get("/Relatorio/TopClientes")
+def top_clientes(
+    request: Request,
+    start_date: date,
+    end_date: date,
+    db: Session = Depends(get_db)
+):
+    # resumo por cliente
     resultado = (
         db.query(
-            models.Cliente.nome,
-            func.sum(models.Nota.valor).label("total_gasto")
+            models.Cliente.nome.label("nome_cliente"),
+            func.sum(models.Nota.valor).label("total_gasto"),
+            func.count(models.Nota.id_nota).label("quantidade_vendas")
         )
-        .join(models.Entrega, models.Cliente.id_cliente == models.Entrega.id_cliente)
-        .join(models.Nota, models.Entrega.id_entrega == models.Nota.id_entrega)
-        .filter(models.Entrega.data >= start_date)
-        .filter(models.Entrega.data <= end_date)
-        .group_by(models.Cliente.id_cliente)
-        .order_by(func.sum(models.Nota.valor).desc())
-        .limit(10)
+        .join(models.Entrega, models.Nota.id_entrega == models.Entrega.id_entrega)
+        .join(models.Cliente, models.Entrega.id_cliente == models.Cliente.id_cliente)
+        .filter(func.date(models.Entrega.data) >= start_date)
+        .filter(func.date(models.Entrega.data) <= end_date)
+        .group_by(models.Cliente.nome)  
+        .order_by(func.sum(models.Nota.valor).desc())  
         .all()
     )
-    return [{"nome": r[0], "total_gasto": float(r[1])} for r in resultado]
+
+    # lista com Nota + Entrega + Cliente
+    registros = (
+        db.query(models.Nota, models.Entrega, models.Cliente.nome)
+        .join(models.Entrega, models.Nota.id_entrega == models.Entrega.id_entrega)
+        .join(models.Cliente, models.Entrega.id_cliente == models.Cliente.id_cliente)
+        .filter(func.date(models.Entrega.data) >= start_date)
+        .filter(func.date(models.Entrega.data) <= end_date)
+        .all()
+    )
+
+    # formatar datas
+    for nota, entrega, cliente_nome in registros:
+        if entrega and entrega.data:
+            entrega.data_formatada = entrega.data.strftime("%d/%m/%Y %H:%M")
+
+    return templates.TemplateResponse(
+        "RelatorioClientes.html",
+        {"request": request, "resultado": resultado, "registros": registros}
+    )
+
 
 @app.get("/Relatorio/RelatorioProdutos")
-def BuscarProdutos(start_date: date, end_date: date,db: Session = Depends(get_db)):
+def BuscarProdutos(
+    request: Request,
+    start_date: date,
+    end_date: date,
+    db: Session = Depends(get_db)):
+    
+
     resultado =  (
     db.query(
         models.Produto.nome,
-        func.count(models.Produto.id_produto).label("quantidade"),
-        func.sum(models.Produto.preco).label("total")
+        func.sum(models.ItemEntrega.quantidade).label("quantidade"),
+        func.sum(models.ItemEntrega.quantidade * models.Produto.preco).label("total")
     )
     .join(models.ItemEntrega, models.ItemEntrega.id_produto == models.Produto.id_produto)
     .join(models.Entrega, models.Entrega.id_entrega == models.ItemEntrega.id_entrega)
-    .filter(models.Entrega.data >= start_date, models.Entrega.data <= end_date)
+    .join(models.Nota, models.Nota.id_entrega == models.Entrega.id_entrega)
+    .filter(func.date(models.Entrega.data) >= start_date)
+    .filter(func.date(models.Entrega.data) <= end_date)
     .group_by(models.Produto.nome)
+    .order_by(func.sum(models.ItemEntrega.quantidade).desc())
     .all()
 )
 
     dados = [
-        {"nome": r[0], "quantidade": r[1], "total": float(r[2])}
+        {"nome": r[0],
+        "quantidade": r[1],
+        "total": float(r[2])
+        }
         for r in resultado
     ]
-    return dados
+    return templates.TemplateResponse(
+        "RelatorioProdutos2.html",
+        {"request": request, "resultado": resultado, "dados": dados}
+    )
+
+
 
 @app.get("/Relatorio/financeiro-notas/")
 def BuscarNotas(

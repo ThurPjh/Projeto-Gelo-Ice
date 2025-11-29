@@ -11,95 +11,77 @@
 </head>
 
 <body>
-    <div class="container mt-5">
-        <div class="container-fluid">
-            <div class="row justify-content-center align-items-center">
+    <div class="container-fluid">
+
+        <div class="col-12">
+            <div class="row justify-content-center align-items-center" style="max-height: 75vh;">
+                <!-- Fundo azul visível apenas em telas médias ou maiores -->
                 <div class="col-md-12 d-none d-md-block bg-azul position-absolute top-0 start-0"></div>
 
-                <div class="col-10 col-md-6 z-1">
+                <!-- Card branco sempre visível -->
+                <div class="col-10 col-md-4 z-1">
                     <div class="card p-4 mt-5 bg-white">
-                        
-                        <img  class="voltar" src="/static/Img/voltar.png" onclick="window.location.href='/Relatorio'" style="cursor: pointer; position: absolute; top: 20px; left: 20px;" alt="Voltar">
+
+                        <img class="voltar" src="/static/Img/voltar.png" onclick="window.location.href='/Relatorio'"
+                            style="cursor: pointer; position: absolute; top: 20px; left: 20px;" alt="Voltar">
 
                         <div class="text-center mb-4">
                             <img src="/static/Img/372ba3ab23b82a3d8594faf835be6f257754f636.png" class="logo"
                                 onclick="window.location.href='/'" style="cursor: pointer;">
                         </div>
 
-                        <!-- Campo Data inicial -->
-                        <div class="mb-3">
-                            <label class="form-label">Data inicial</label>
-                            <input type="date" class="form-control" id="data_inicio">
-                        </div>
+                        <form method="get" action="/Relatorio/TopClientes">
+                            <div class="mb-3">
+                                <label class="form-label">Data inicial</label>
+                                <input type="date" class="form-control" name="start_date" required>
+                            </div>
 
-                        <!-- Campo Data final -->
-                        <div class="mb-3">
-                            <label class="form-label">Data final</label>
-                            <input type="date" class="form-control" id="data_fim">
-                        </div>
+                            <div class="mb-3">
+                                <label class="form-label">Data final</label>
+                                <input type="date" class="form-control" name="end_date" required>
+                            </div>
 
-                        <!-- Botão -->
-                        <div class="mb-3 text-center">
-                            <button class="btn btn-primary" onclick="buscarTopClientes()">Buscar Relatório</button>
+                            <div class="mb-3 text-center">
+                                <button class="btn btn-primary" type="submit">Buscar Relatório</button>
+                            </div>
+                        </form>
+
+                        {% if resultado %}
+
+                        <h5 class="mt-4">Ranking de clientes:</h5>
+
+                        <br>
+                        <div class="row justify-content-center">
+                            <ul>
+                                {% for cliente in resultado %}
+                                <li class="card p-4 me-3 container-fluid card-com-sombra">
+                                    Cliente: {{ cliente.nome_cliente }} <br>
+                                    Receita total: R$ {{ cliente.total_gasto }} <br>
+                                    Quantidade de vendas: {{ cliente.quantidade_vendas }}
+                                </li>
+                                <br>
+                                {% endfor %}
+
+                            </ul>
                         </div>
+                        {% endif %}
+
+
+
+
                     </div>
+
+
                 </div>
             </div>
         </div>
-
-        <!-- Tabela para mostrar os clientes -->
-        <table class="table table-striped table-bordered mt-4" id="tabela_clientes">
-            <thead class="table-dark">
-                <tr>
-                    <th>#</th>
-                    <th>Cliente</th>
-                    <th>Total gasto</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Linhas preenchidas dinamicamente pelo JS -->
-            </tbody>
-        </table>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
-    <script>
-        async function buscarTopClientes() {
-            const inicio = document.getElementById("data_inicio").value;
-            const fim = document.getElementById("data_fim").value;
 
-            if (!inicio || !fim) {
-                alert("Preencha as duas datas!");
-                return;
-            }
-
-            try {
-                const response = await fetch(`/Relatorio/TopClientes/?start_date=${inicio}&end_date=${fim}`, { method: "GET" });
-                if (!response.ok) throw new Error("Erro HTTP " + response.status);
-
-                const clientes = await response.json();
-
-                const tabela = document.getElementById("tabela_clientes").querySelector("tbody");
-                tabela.innerHTML = "";
-
-                clientes.forEach((cliente, index) => {
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${index + 1}</td>
-                        <td>${cliente.nome}</td>
-                        <td>R$ ${cliente.total_gasto.toFixed(2)}</td>
-                    `;
-                    tabela.appendChild(row);
-                });
-            } catch (error) {
-                alert("Erro ao buscar clientes: " + error);
-            }
-        }
-    </script>
 </body>
 
 </html>

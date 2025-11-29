@@ -20,7 +20,7 @@
                     <div class="card p-4 mt-5 bg-white">
 
                         <div class="card-header sticky-header">
-                            <img class="voltar" src="/static/Img/voltar.png" onclick="window.location.href='/Relatorio'"
+                            <img class="voltar" src="/static/Img/voltar.png" onclick="window.location.href='/RelatorioProdutos'"
                                 style="cursor: pointer; position: absolute; top: 20px; left: 20px;" alt="Voltar">
 
                             <div class="text-center mb-4 P-2">
@@ -29,21 +29,34 @@
                             </div>
                         </div>
 
-                        <form method="get" action="/Relatorio/RelatorioProdutos" >
-                            <div class="mb-3">
-                                <label class="form-label">Data inicial</label>
-                                <input type="date" class="form-control" name="start_date" required>
-                            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Data final</label>
-                                <input type="date" class="form-control" name="end_date" required>
-                            </div>
+                        {% if resultado %}
+                        <h5 class="mt-4">Ranking produtos</h5>
 
-                            <div class="mb-3 text-center">
-                                <button class="btn btn-primary" type="submit">Buscar Relatório</button>
-                            </div>
-                        </form>
+                        <br>
+                        <div class="row justify-content-center">
+                            <ul>
+                                {% for produto in dados %}
+                                <li class="card p-4 me-3 container-fluid card-com-sombra">
+                                    Produto: {{ produto.nome }} <br>
+                                    Quantidade vendida: {{ produto.quantidade }} <br>
+
+                                    {%if produto.nome != 'Cubo 4kg' and
+                                    produto.nome != 'Barra 10kg' and
+                                    produto.nome != 'Cubo 2kg' and
+                                    produto.nome != 'Cubo 10kg'
+                                    %}
+                                    Quantidade de caixas: {{ (produto.quantidade // 30) }} <br>
+                                    {%endif%}
+
+                                    Receita total: R$ {{ "%.2f"|format(produto.total)|replace('.', ',') }}
+                                </li>
+                                {% endfor %}
+
+                            </ul>
+                        </div>
+                        {%endif %}
+
 
                     </div>
                 </div>
