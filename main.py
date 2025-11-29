@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Form, Depends, HTTPException
+from fastapi import FastAPI, Request, Form, Depends, HTTPException, Query
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -548,16 +548,21 @@ def BuscarProdutos(
     ]
     return templates.TemplateResponse(
         "RelatorioProdutos2.html",
-        {"request": request, "resultado": resultado, "dados": dados}
+        {
+        "request": request,
+        "resultado": resultado,
+        "dados": dados
+        }
     )
 
 
 
 @app.get("/Relatorio/financeiro-notas/")
 def BuscarNotas(
+    request: Request,
     start_date: date,
     end_date: date,
-    apenas_nao_pagas: bool = False,
+    apenas_nao_pagas: bool = Query(False),
     db: Session = Depends(get_db)
 ):
     query = (
@@ -570,7 +575,7 @@ def BuscarNotas(
     )
 
     if apenas_nao_pagas:
-        query = query.filter(models.Entrega.pago == False)
+        query = query.filter(models.Nota.status_pagamento == 'pendente')
 
     resultado = query.all()
 
@@ -579,12 +584,18 @@ def BuscarNotas(
         notas.append({
             "id_entrega": entrega.id_entrega,
             "id_nota": nota.id_nota,
-            "data": entrega.data.isoformat() if entrega.data else None,
+            "data": entrega.data.strftime("%d/%m/%Y %H:%M") if entrega.data else None,
             "cliente": cliente.nome,
             "valor": float(nota.valor),
             "status_pagamento": nota.status_pagamento
+    
         })
-
-    return notas
-
+    
+    return templates.TemplateResponse(
+        "financeiro-nota2.html",
+        {"request": request,
+        "resultado": resultado,
+        "notas": notas
+          }
+    )
 

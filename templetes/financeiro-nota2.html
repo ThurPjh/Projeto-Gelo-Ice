@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório Notas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/Img/style.css">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="container-fluid">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-md-12 d-none d-md-block bg-azul position-absolute top-0 start-0"></div>
+
+                <div class="col-10 col-md-6 z-1">
+                    <div class="card p-4 mt-5 bg-white">
+                        <div class="card-header sticky-header mb-4">
+                            <img class="voltar" src="/static/Img/voltar.png"
+                                onclick="window.location.href='/financeiro-notas'"
+                                style="cursor: pointer; position: absolute; top: 20px; left: 20px;" alt="Voltar">
+
+                            <div class="text-center mb-4">
+                                <img src="/static/Img/372ba3ab23b82a3d8594faf835be6f257754f636.png" class="logo"
+                                    onclick="window.location.href='/'" style="cursor: pointer;">
+                            </div>
+                        </div>
+                        {% if notas %}
+
+                        {% for nota in notas%}
+
+                        <div class="card card-com-sombra">
+                            Cliente: {{nota.cliente}}<br>
+                            Data: {{nota.data}}<br>
+                            Valor: {{ "%.2f" | format (nota.valor)| replace ('.' ,',')}}<br>
+                            <span>Status atual: {{nota.status_pagamento}}</span>
+                        </div>
+                        <br>
+                        {% endfor%}
+
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>

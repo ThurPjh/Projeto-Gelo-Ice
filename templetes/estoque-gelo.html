@@ -74,11 +74,11 @@
                     <div class="flex-grow-1">
                         <strong>{{ produto.nome }}</strong><br>
                         Quantidade: <span>{{ produto.quantidade }}</span><br>
-                        R$ <span>{{ produto.preco }}</span>
+                        R$ <span>{{ (produto.preco )| replace('.',',') }}</span>
                     </div>
                     <div class="text-end" style="font-size: 0.9rem;">
                         Valor total<br>
-                        <strong>R$ {{ "%.2f"|format(produto.quantidade * produto.preco) }}</strong>
+                        <strong>R$ {{ "%.2f"|format(produto.quantidade * produto.preco)| replace('.',',') }}</strong>
                     </div>
                 </div>
             </div>

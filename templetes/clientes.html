@@ -17,6 +17,11 @@
                 <!--LOGO-->
 
                 <div>
+                    <img class="voltar" src="/static/Img/voltar.png"
+                                onclick="window.location.href='/'"
+                                style="cursor: pointer; position: absolute; top: 20px; left: 20px;" alt="Voltar">
+
+
                     <img src="/static/Img/372ba3ab23b82a3d8594faf835be6f257754f636.png" class="logo" alt="Logo Gelo ICE"
                         style="cursor: pointer;" onclick="window.location.href='/'">
                 </div>
@@ -90,7 +95,7 @@
                         <img src="/static/Img/clientes.png" class="me-3 icone-gelo">
                         <div class="d-flex flex-column">
                             <strong>{{ cliente.nome }}</strong>
-                            <span class="mb-1">Telefone: {{ cliente.telefone }}</span>
+                            <span class="mb-1"></span>
                             <!-- Botão abre modal específico -->
                             <button class="btn btn-outline-light mt-2" data-bs-toggle="modal"
                                 data-bs-target="#info{{ cliente.id_cliente }}">

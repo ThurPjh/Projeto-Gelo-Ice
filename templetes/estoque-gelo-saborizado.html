@@ -45,7 +45,7 @@
                                     <select class="form-select" name="id_produto" required>
                                         {% for produto in produtos %}
                                         <option value="{{ produto.id_produto }}">{{ produto.nome }} - R$ {{
-                                            "%.2f"|format(produto.preco) }}</option>
+                                            "%.2f"|format(produto.preco)| replace('.',',')  }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -71,11 +71,11 @@
                         <strong>{{ produto.nome }}</strong><br>
                         Quantidade: <span>{{ produto.quantidade }}</span><br>
                         Caixas: <span>{{ "%.0f"|format(produto.quantidade / 30 )}}</span><br>
-                        R$ <span>{{ "%.2f"|format(produto.preco) }}</span>
+                        R$ <span>{{ "%.2f"|format(produto.preco)| replace('.',',')  }}</span>
                     </div>
                     <div class="text-end">
                         Valor total<br>
-                        <strong>R$ {{ "%.2f"|format(produto.quantidade * produto.preco) }}</strong>
+                        <strong>R$ {{ "%.2f"|format(produto.quantidade * produto.preco) | replace('.',',') }}</strong>
                     </div>
                 </div>
             </div>
