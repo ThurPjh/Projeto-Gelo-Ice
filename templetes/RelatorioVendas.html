@@ -55,10 +55,10 @@
                         <h5 class="mt-4">Entregas no período:</h5>
                         <ul>
                             {% for nota, entrega, nome_cliente in registros %}
-                            <li>
+                            <li class="card p-3 me-3 card-com-sombra">
                                 Cliente: {{ nome_cliente }} <br>
                                 Status da Nota: {{ nota.status_pagamento }} <br>
-                                Valor: {{ nota.valor }} <br>
+                                Valor: {{ nota.valor| replace('.', ',') }} <br>
                                 Data: {{ entrega.data_formatada }}
                             </li>
                             <br>
