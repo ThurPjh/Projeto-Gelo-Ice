@@ -114,12 +114,41 @@ def financeiro_notas(request: Request, db: Session = Depends(get_db)):
 def estoque(request: Request):
     return templates.TemplateResponse("estoque-main.html", {"request": request})
 
+
+
+#Rota gelo saborizado
 @app.get("/estoque-saborizado", response_class=HTMLResponse)
 def estoque_saborizado(request: Request, db: Session = Depends(get_db)):
-    produtos = db.query(Produto).filter(Produto.tipo == "saborizado").order_by(Produto.quantidade.desc()).all()
-    return templates.TemplateResponse("estoque-gelo-saborizado.html", {"request": request, "produtos": produtos,})
+    produtos = (
+        db.query(Produto)
+        .filter(Produto.tipo == "saborizado")
+        .order_by(Produto.quantidade.desc())
+        .all()
+    )
+
+    imagens = {
+    "Coco": "https://cocoleve.com.br/cdn/shop/files/coco.png?v=1763137070",
+    "Melancia": "https://cocoleve.com.br/cdn/shop/files/Melancia.png?v=1763137070",
+    "Maracujá": "https://cocoleve.com.br/cdn/shop/files/maracuja.png?v=1763137070",
+    "Cerveja": "https://cocoleve.com.br/cdn/shop/files/cerveja.png?v=1763137070",
+    "Morango": "https://cocoleve.com.br/cdn/shop/files/morango.png?v=1763137070",
+    "Beats Red Mix":"https://cocoleve.com.br/cdn/shop/files/red.png?v=1763137070",
+    "Beats Sense": "https://cocoleve.com.br/cdn/shop/files/gt.png?v=1763137070",
+    "Limão e Gengibre": "https://cocoleve.com.br/cdn/shop/files/xeque_mate.png?v=1763137070",
+    "Maçã Verde": "https://cocoleve.com.br/cdn/shop/files/maca.png?v=1763137070",
+    "Laranja": "https://cocoleve.com.br/cdn/shop/files/laranja.png?v=1763137070",
+    "Beats GT": "https://cocoleve.com.br/cdn/shop/files/senses.png?v=1763137070",
+    "Limão": "https://cocoleve.com.br/cdn/shop/files/limao.png?v=1763137070"
+}
 
 
+    return templates.TemplateResponse(
+        "estoque-gelo-saborizado.html",
+        {"request": request, "produtos": produtos, "imagens": imagens}
+    )
+
+
+#rota gelo
 @app.get("/estoque-gelo", response_class=HTMLResponse)
 def estoque_gelo(request: Request, db: Session = Depends(get_db)):
     produtos = db.query(Produto).filter(Produto.tipo == "gelo").all()
