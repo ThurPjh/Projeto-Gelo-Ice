@@ -51,6 +51,13 @@ def get_db():
         db.close()
 
 
+#VERIFICAR SE ESTA LOGADO
+def get_current_user(request: Request):
+    user = request.cookies.get("user")
+    return user
+
+
+
 @app.get("/", response_class=HTMLResponse)
 def inicio(request: Request):
     return templates.TemplateResponse("inicio.html", {"request": request})
@@ -64,12 +71,15 @@ def login_get(request: Request):
 @app.post("/login")
 def login_post(
     request: Request,
-    username: str = Form(...),  # 
+    username: str = Form(...),
     password: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    if AuthUser(db, username, password):
-        return RedirectResponse(url="/", status_code=303)
+    user = AuthUser(db, username, password)
+    if user:
+        response = RedirectResponse(url="/", status_code=303)
+        response.set_cookie(key="user", value=user.username)  #SALVA O LOGIN
+        return response
     else:
         return templates.TemplateResponse(
             "login.html",
@@ -77,36 +87,69 @@ def login_post(
             status_code=401
         )
 
+
 #PÀGINAS FINANCEIRO
 
 
 @app.get("/financeiro", response_class=HTMLResponse)
 def financeiro(request: Request):
-    return templates.TemplateResponse("financeiro-main.html", {"request": request})
+
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    
+    return templates.TemplateResponse("financeiro-main.html", {"request": request, "user": user})
+
+
 
 @app.get("/Relatorio", response_class=HTMLResponse)
 def financeiro(request: Request):
-    return templates.TemplateResponse("Relatorio.html", {"request": request})
+
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    
+    return templates.TemplateResponse("Relatorio.html", {"request": request, "user": user})
 
 @app.get("/RelatorioVendas", response_class=HTMLResponse)
 def financeiro(request: Request):
-    return templates.TemplateResponse("RelatorioVendas.html", {"request": request})
+
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    
+    return templates.TemplateResponse("RelatorioVendas.html", {"request": request, "user": user})
 
 @app.get("/RelatorioProdutos", response_class=HTMLResponse)
 def financeiro(request: Request):
-    return templates.TemplateResponse("RelatorioProdutos.html", {"request": request})
+
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    
+    return templates.TemplateResponse("RelatorioProdutos.html", {"request": request, "user": user})
 
 @app.get("/TopClientes", response_class=HTMLResponse)
 def relatorio_clientes(request: Request):
-    return templates.TemplateResponse("RelatorioClientes.html", {"request": request})
+
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    
+    return templates.TemplateResponse("RelatorioClientes.html", {"request": request, "user": user})
 
 @app.get("/financeiro-notas", response_class=HTMLResponse)
 def financeiro_notas(request: Request, db: Session = Depends(get_db)):
+    
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    
     entregas = db.query(Entrega).options(
         joinedload(Entrega.itens).joinedload(ItemEntrega.produto),
         joinedload(Entrega.cliente)
     ).order_by(Entrega.data.desc()).all()
-    return templates.TemplateResponse("financeiro-notas.html", {"request": request, "entregas": entregas})
+    return templates.TemplateResponse("financeiro-notas.html", {"request": request, "entregas": entregas, "user": user})
 
 #PÀGINAS ESTOQUE
 
@@ -119,6 +162,12 @@ def estoque(request: Request):
 #Rota gelo saborizado
 @app.get("/estoque-saborizado", response_class=HTMLResponse)
 def estoque_saborizado(request: Request, db: Session = Depends(get_db)):
+    
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    
+
     produtos = (
         db.query(Produto)
         .filter(Produto.tipo == "saborizado")
@@ -144,16 +193,23 @@ def estoque_saborizado(request: Request, db: Session = Depends(get_db)):
 
     return templates.TemplateResponse(
         "estoque-gelo-saborizado.html",
-        {"request": request, "produtos": produtos, "imagens": imagens}
+        {"request": request, "produtos": produtos, "imagens": imagens, "user": user }
     )
 
 
 #rota gelo
 @app.get("/estoque-gelo", response_class=HTMLResponse)
 def estoque_gelo(request: Request, db: Session = Depends(get_db)):
-    produtos = db.query(Produto).filter(Produto.tipo == "gelo").all()
-    return templates.TemplateResponse("estoque-gelo.html", {"request": request, "produtos": produtos})
+   
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    
 
+    produtos = db.query(Produto).filter(Produto.tipo == "gelo").all()
+    return templates.TemplateResponse("estoque-gelo.html", {"request": request, "produtos": produtos, "user": user})
+
+    
 
 def gerar_mensagem(cliente_nome, notas_em_aberto, itens, total, data=None):
     mensagem = "*Mensagem automática*\n"
@@ -172,6 +228,12 @@ def gerar_mensagem(cliente_nome, notas_em_aberto, itens, total, data=None):
 
 @app.get("/clientes", response_class=HTMLResponse)
 def clientes(request: Request, db: Session = Depends(get_db)):
+
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    
+
     lista_clientes = (
         db.query(Cliente, func.count(Nota.id_nota).label("qtd"))
         .join(Entrega, Entrega.id_cliente == Cliente.id_cliente)
@@ -232,7 +294,8 @@ def clientes(request: Request, db: Session = Depends(get_db)):
             "notas": notas,
             "notas_clientes": notas_clientes,
             "totais_pendentes": totais_pendentes,
-            "totais_clientes": totais_clientes
+            "totais_clientes": totais_clientes,
+            "user": user
         }
     )
 
@@ -245,13 +308,28 @@ def entrega(request: Request):
 
 @app.get("/entregas-registro", response_class=HTMLResponse)
 def entregas_registro(request: Request, db: Session = Depends(get_db)):
+
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    
     clientes = db.query(Cliente).all()
     produtos = db.query(Produto).order_by(Produto.id_produto.asc()).all()
-    return templates.TemplateResponse("entregas-registro.html", {"request": request, "clientes": clientes, "produtos": produtos})
+    return templates.TemplateResponse("entregas-registro.html", {
+        "request": request,
+        "clientes": clientes,
+        "produtos": produtos,
+        "user": user})
 
 
 @app.get("/entregas-historico")
 def entregas_historico(request: Request, db: Session = Depends(get_db)):
+   
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    
+
     entregas = db.query(Entrega).order_by(Entrega.data.desc()).all()
     notas = db.query(Nota).options(
     joinedload(Nota.entrega).joinedload(Entrega.cliente)).all()
@@ -259,7 +337,8 @@ def entregas_historico(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse("entregas-historico.html", {
         "request": request, 
         "entregas": entregas,
-        "notas": notas
+        "notas": notas, 
+        "user": user
         })
 
 # PÀGINAS ALUGUEIS
@@ -270,16 +349,36 @@ def alugueis(request: Request):
 
 @app.get("/caixas", response_class=HTMLResponse)
 def caixas(request: Request, db: Session = Depends(get_db)):
+
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    
+
     caixas = db.query(Caixa).order_by(Caixa.numero.asc()).all()
-    return templates.TemplateResponse("caixas.html", {"request": request, "caixas": caixas})
+    return templates.TemplateResponse("caixas.html", {
+        "request": request, 
+        "caixas": caixas,
+        "user": user
+        })
 
 @app.get("/geladeiras")
 def listar_geladeiras(request: Request, db: Session = Depends(get_db)):
+
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    
+
     geladeiras = db.query(Geladeira).order_by(Geladeira.numero.asc()).all()
     clientes = db.query(Cliente).all()
     return templates.TemplateResponse(
         "geladeiras.html",
-        {"request": request, "geladeiras": geladeiras, "clientes": clientes}
+        {"request": request,
+        "geladeiras": geladeiras, 
+        "clientes": clientes,
+        "user": user
+        }
     )
 
 
@@ -488,6 +587,8 @@ def vendas_resumo(
     start_date: date,
     end_date: date,
     db: Session = Depends(get_db)
+
+
 ):
     # resumo de vendas
     resultado = (
