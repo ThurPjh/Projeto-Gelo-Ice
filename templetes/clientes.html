@@ -3,14 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clientes - Gelo ICE</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/Img/style.css">
 </head>
 
 <body>
-    <div class="container-fluid my-4" style="max-width: 380px;">
-        <div class="col-12">
+    <div class="container my-4" style="max-width: 380px;">
+        
             <div class="card p-4" style="max-height: 75vh; overflow-y: auto;">
 
 
@@ -133,22 +134,15 @@
 
 
                                 <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Valor</th>
-                                            <th>Status</th>
-                                            <th>Data</th>
-                                            <th>Alterar status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                                    
+                                    <tbody> 
                                         {% for nota in notas %}
                                         {% if nota.entrega.id_cliente == cliente.id_cliente %}
                                         {% if nota.status_pagamento == "pendente" %}
-                                        <tr>
-                                            <td>{{ nota.valor }}</td>
-                                            <td>{{ nota.status_pagamento }}</td>
-                                            <td>{{ nota.data_formatada }}</td>
+                                        <tr class="card card-com-sombra-vermelho">
+                                            <td><Span> <strong>Valor:  </strong></Span> {{ (nota.valor)| replace ('.',',') }}</td>
+                                            <td><Span> <strong>Status:  </strong></Span>{{ nota.status_pagamento }}</td>
+                                            <td><Span> <strong>Data:  </strong></Span>{{ nota.data_formatada }}</td>
 
                                             <td>
                                                 <form method="post" action="/notas/{{ nota.id_nota }}/pagar">
@@ -158,11 +152,7 @@
                                                     </button>
                                                 </form>
                                             </td>
-
-                                        </tr>
-
-                                        <tr>
-                                            <td colspan="4" >
+                                            <td colspan="4" class="card mt-3">
                                                 <strong>Produtos dessa nota:</strong>
                                                 <ul>
                                                     {% for item in nota.entrega.itens %}
@@ -170,7 +160,10 @@
                                                     {% endfor %}
                                                 </ul>
                                             </td>
+
                                         </tr>
+
+
 
                                         {% endif %}
                                         {% endif %}
@@ -220,7 +213,7 @@
 
 
             </div>
-        </div>
+        
     </div>
     </div>
     </div>

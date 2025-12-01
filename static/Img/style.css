@@ -127,13 +127,28 @@
 }
 
 .card-com-sombra {
-    box-shadow: 0px -2px 0px rgb(24, 97, 165);
+    box-shadow: 0px -2px 0px rgba(0, 128, 0, 0.616);
     border-radius: 8px;
     padding: 12px;
     margin-bottom: 16px;
     padding-right: 20px;
 }
 
+.card-com-sombra-vermelho {
+    box-shadow: 0px -2px 0px rgba(255, 0, 0, 0.548);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+    padding-right: 20px;
+}
+
+.card-com-sombra-azul {
+    box-shadow: 0px -2px 0px #1280c9;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+    padding-right: 20px;
+}
 .sticky-header {
     position: sticky;
     top: 0;         

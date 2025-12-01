@@ -15,9 +15,8 @@
         <div class="container-fluid">
             <div class="row justify-content-center align-items-center">
                 <div class="col-md-12 d-none d-md-block bg-azul position-absolute top-0 start-0"></div>
-
                 <div class="col-10 col-md-6 z-1">
-                    <div class="card p-4 mt-5 bg-white">
+                    <div class="card p-4 mt-5 bg-white" style="max-height:800px; overflow-y:auto;">
                         <div class="card-header sticky-header mb-4">
                             <img class="voltar" src="/static/Img/voltar.png"
                                 onclick="window.location.href='/financeiro-notas'"
@@ -32,12 +31,25 @@
 
                         {% for nota in notas%}
 
+                        {%if nota.status_pagamento == 'pendente'%}
+                        <div class="card card-com-sombra-vermelho">
+                            Cliente: {{nota.cliente}}<br>
+                            Data: {{nota.data}}<br>
+                            Valor: {{ "%.2f" | format (nota.valor)| replace ('.' ,',')}}<br>
+                            <span>Status atual: {{nota.status_pagamento}}</span>
+                        </div>
+
+                        {% else %}
+
                         <div class="card card-com-sombra">
                             Cliente: {{nota.cliente}}<br>
                             Data: {{nota.data}}<br>
                             Valor: {{ "%.2f" | format (nota.valor)| replace ('.' ,',')}}<br>
                             <span>Status atual: {{nota.status_pagamento}}</span>
                         </div>
+
+                        {% endif %}
+
                         <br>
                         {% endfor%}
 
@@ -45,6 +57,7 @@
 
                     </div>
                 </div>
+                
             </div>
         </div>
 

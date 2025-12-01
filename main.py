@@ -26,6 +26,23 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templetes")
 
 
+# de imagens
+imagens = {
+    "Coco": "https://cocoleve.com.br/cdn/shop/files/coco.png?v=1763137070",
+    "Melancia": "https://cocoleve.com.br/cdn/shop/files/Melancia.png?v=1763137070",
+    "Maracujá": "https://cocoleve.com.br/cdn/shop/files/maracuja.png?v=1763137070",
+    "Cerveja": "",
+    "Morango": "",
+    "Beats Red Mix": "",
+    "Beats Sense": "",
+    "Limão e Gengibre": "",
+    "Maçã Verde": "",
+    "Laranja": "",
+    "Beats GT": "",
+    "Limão": ""
+}
+
+
 def get_db():
     db = SessionLocal()
     try:
@@ -100,7 +117,7 @@ def estoque(request: Request):
 @app.get("/estoque-saborizado", response_class=HTMLResponse)
 def estoque_saborizado(request: Request, db: Session = Depends(get_db)):
     produtos = db.query(Produto).filter(Produto.tipo == "saborizado").order_by(Produto.quantidade.desc()).all()
-    return templates.TemplateResponse("estoque-gelo-saborizado.html", {"request": request, "produtos": produtos})
+    return templates.TemplateResponse("estoque-gelo-saborizado.html", {"request": request, "produtos": produtos,})
 
 
 @app.get("/estoque-gelo", response_class=HTMLResponse)
@@ -126,7 +143,15 @@ def gerar_mensagem(cliente_nome, notas_em_aberto, itens, total, data=None):
 
 @app.get("/clientes", response_class=HTMLResponse)
 def clientes(request: Request, db: Session = Depends(get_db)):
-    lista_clientes = db.query(Cliente).order_by(Cliente.nome.asc()).all()
+    lista_clientes = (
+        db.query(Cliente, func.count(Nota.id_nota).label("qtd"))
+        .join(Entrega, Entrega.id_cliente == Cliente.id_cliente)
+        .join(Nota, Nota.id_entrega == Entrega.id_entrega)
+        .group_by(Cliente.id_cliente)
+        .order_by(func.count(Nota.id_nota).desc())   
+        .all()
+    )
+
     entregas = db.query(Entrega).all()
 
     # carrega notas junto com entrega e cliente
@@ -134,14 +159,13 @@ def clientes(request: Request, db: Session = Depends(get_db)):
         joinedload(Nota.entrega).joinedload(Entrega.cliente)
     ).all()
 
-    # formatar data de entrega 
+    # formatar data de entrega
     for nota in notas:
         if nota.entrega:
             nota.data_formatada = nota.entrega.data.strftime("%d/%m/%Y %H:%M")
 
-
-
     # calcula quantidade de notas pendentes por cliente
+
     pendentes = (
         db.query(Cliente.id_cliente, func.count(Nota.id_nota))
         .join(Entrega, Entrega.id_cliente == Cliente.id_cliente)
@@ -152,10 +176,13 @@ def clientes(request: Request, db: Session = Depends(get_db)):
     )
     notas_clientes = {cliente_id: qtd for cliente_id, qtd in pendentes}
 
-     # total geral de notas por cliente
+
+
+    # total geral de notas por cliente
+
     totais_clientes = {}
     totais_pendentes = {}
-    for cliente in lista_clientes:
+    for cliente, qtd in lista_clientes:   
         total = sum(
             nota.valor for nota in notas
             if nota.entrega and nota.entrega.id_cliente == cliente.id_cliente
@@ -171,7 +198,7 @@ def clientes(request: Request, db: Session = Depends(get_db)):
         "clientes.html",
         {
             "request": request,
-            "clientes": lista_clientes,
+            "clientes": [c for c, qtd in lista_clientes],  
             "entregas": entregas,
             "notas": notas,
             "notas_clientes": notas_clientes,
@@ -593,7 +620,8 @@ def BuscarNotas(
     
     return templates.TemplateResponse(
         "financeiro-nota2.html",
-        {"request": request,
+        {
+        "request": request,
         "resultado": resultado,
         "notas": notas
           }

@@ -20,7 +20,7 @@
 
                 <!-- Card branco sempre visível -->
                 <div class="col-10 col-md-4 z-1">
-                    <div class="card p-4 mt-5 bg-white">
+                    <div class="card p-4 mt-5 bg-white" style="max-height:800px; overflow-y:auto;">
 
                         <img class="voltar" src="/static/Img/voltar.png" onclick="window.location.href='/Relatorio'"
                             style="cursor: pointer; position: absolute; top: 20px; left: 20px;" alt="Voltar">
@@ -54,7 +54,7 @@
                         <div class="row justify-content-center">
                             <ul>
                                 {% for cliente in resultado %}
-                                <li class="card p-4 me-3 container-fluid card-com-sombra">
+                                <li class="card p-4 me-3 container-fluid card-com-sombra-azul">
                                     Cliente: {{ cliente.nome_cliente }} <br>
                                     Receita total: R$ {{ cliente.total_gasto }} <br>
                                     Quantidade de vendas: {{ cliente.quantidade_vendas }}

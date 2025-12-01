@@ -14,7 +14,8 @@
     <div class="container my-4" style="max-width: 380px;">
         <div class="card p-2 mt-5" style="max-height: 75vh; overflow-y: auto;">
 
-            <img  class="voltar" src="/static/Img/voltar.png" onclick="window.location.href='/estoque'" style="cursor: pointer; position: absolute; top: 20px; left: 20px;" alt="Voltar">
+            <img class="voltar" src="/static/Img/voltar.png" onclick="window.location.href='/estoque'"
+                style="cursor: pointer; position: absolute; top: 20px; left: 20px;" alt="Voltar">
 
             <!-- Logo -->
             <div>
@@ -45,7 +46,7 @@
                                     <select class="form-select" name="id_produto" required>
                                         {% for produto in produtos %}
                                         <option value="{{ produto.id_produto }}">{{ produto.nome }} - R$ {{
-                                            "%.2f"|format(produto.preco)| replace('.',',')  }}</option>
+                                            "%.2f"|format(produto.preco)| replace('.',',') }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -64,14 +65,19 @@
 
 
             {% for produto in produtos %}
-            <div class="card mb-3 p-2" style="background:#1280c9; color:white; border-radius:12px;">
+            <div class="card mb-3 p-2" style="background:#2058cd; color:white; border-radius:12px;">
                 <div class="d-flex align-items-center">
-                    <img src="/static/Img/Gelo.png" class="me-3 icone-gelo">
+
+                    <img src="{{ imagens.get(produto.nome, '') }}" 
+                    class="me-3 icone-gelo" 
+                    style="border-radius: 90px;">
+
+                    
                     <div class="flex-grow-1">
                         <strong>{{ produto.nome }}</strong><br>
                         Quantidade: <span>{{ produto.quantidade }}</span><br>
                         Caixas: <span>{{ "%.0f"|format(produto.quantidade / 30 )}}</span><br>
-                        R$ <span>{{ "%.2f"|format(produto.preco)| replace('.',',')  }}</span>
+                        R$ <span>{{ "%.2f"|format(produto.preco)| replace('.',',') }}</span>
                     </div>
                     <div class="text-end">
                         Valor total<br>
@@ -86,7 +92,7 @@
     </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
